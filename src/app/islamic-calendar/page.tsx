@@ -195,6 +195,7 @@ export default function IslamicCalendar() {
   };
 
   const isSpecialDay = (day: CalendarDay) => {
+    if (!day?.date?.hijri) return false;
     const hijriDay = parseInt(day.date.hijri.day);
     const hijriMonth = day.date.hijri.month.number;
     
@@ -204,6 +205,7 @@ export default function IslamicCalendar() {
   };
 
   const getSpecialDayInfo = (day: CalendarDay) => {
+    if (!day?.date?.hijri) return null;
     const hijriDay = parseInt(day.date.hijri.day);
     const hijriMonth = day.date.hijri.month.number;
     
@@ -425,12 +427,16 @@ export default function IslamicCalendar() {
                               ? 'text-purple-700 dark:text-purple-300'
                               : 'text-gray-900 dark:text-white'
                         }`}>
-                          {state.calendarType === 'gregorian' ? day.date.gregorian.day : day.date.hijri.day}
+                          {state.calendarType === 'gregorian' 
+                            ? day.date.gregorian.day 
+                            : day.date.hijri?.day || ''}
                         </div>
 
                         {/* Secondary Date */}
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                          {state.calendarType === 'gregorian' ? day.date.hijri.day : day.date.gregorian.day}
+                          {state.calendarType === 'gregorian' 
+                            ? day.date.hijri?.day || '' 
+                            : day.date.gregorian.day}
                         </div>
 
                         {/* Special Day Indicator */}

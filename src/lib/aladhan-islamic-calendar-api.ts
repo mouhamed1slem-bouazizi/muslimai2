@@ -22,7 +22,7 @@ export interface IslamicMonth {
 export interface IslamicMonthsResponse {
   code: number;
   status: string;
-  data: IslamicMonth[];
+  data: { [key: string]: IslamicMonth };
 }
 
 export interface SpecialDay {
@@ -227,7 +227,8 @@ export async function getIslamicMonths(): Promise<IslamicMonth[]> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: IslamicMonthsResponse = await response.json();
-    return data.data;
+    // Convert object to array
+    return Object.values(data.data);
   } catch (error) {
     console.error('Error fetching Islamic months:', error);
     throw error;
