@@ -128,15 +128,15 @@ export default function IslamicCalendar() {
           specialDays: comprehensiveData.specialDays.data || [],
           islamicMonths: comprehensiveData.islamicMonths.data || [],
           currentInfo: {
-            currentYear: (typeof comprehensiveData.currentYear === 'object' && comprehensiveData.currentYear?.data?.year) 
+            currentYear: comprehensiveData.currentYear?.data?.year 
               ? Number(comprehensiveData.currentYear.data.year) 
-              : (typeof comprehensiveData.currentYear === 'number' ? comprehensiveData.currentYear : 1445),
-            currentMonth: (typeof comprehensiveData.currentMonth === 'object' && comprehensiveData.currentMonth?.data) 
-              ? (comprehensiveData.currentMonth.data.month?.ar || comprehensiveData.currentMonth.data.month?.en || 'Ramadan')
-              : (typeof comprehensiveData.currentMonth === 'string' ? comprehensiveData.currentMonth : 'Ramadan'),
-            nextHoliday: (typeof comprehensiveData.nextHoliday === 'object' && comprehensiveData.nextHoliday?.data?.name) 
+              : 1445,
+            currentMonth: comprehensiveData.currentMonth?.data?.month 
+              ? (language === 'ar' ? comprehensiveData.currentMonth.data.month.ar : comprehensiveData.currentMonth.data.month.en)
+              : (language === 'ar' ? 'رمضان' : 'Ramadan'),
+            nextHoliday: comprehensiveData.nextHoliday?.data?.name 
               ? comprehensiveData.nextHoliday.data.name 
-              : 'Eid al-Fitr'
+              : (language === 'ar' ? 'عيد الفطر' : 'Eid al-Fitr')
           },
           loading: false
         }));

@@ -95,14 +95,14 @@ const Header = () => {
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
-                <a
+                <Link
                   key={item.href}
                   href={item.href}
                   className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200"
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm font-medium">{item.label}</span>
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -204,7 +204,7 @@ const Header = () => {
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <Link
                     key={item.href}
                     href={item.href}
                     className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors duration-200"
@@ -212,7 +212,7 @@ const Header = () => {
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>
-                  </a>
+                  </Link>
                 );
               })}
             </nav>
