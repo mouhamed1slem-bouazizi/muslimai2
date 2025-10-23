@@ -18,8 +18,14 @@ import {
   Sunset,
   Moon
 } from 'lucide-react';
-import { calculatePrayerTimes, formatPrayerTime, getCurrentPrayer, getNextPrayer, getTimeUntilNextPrayer, getPrayerName } from '@/lib/prayer-times';
 import { useAuth } from '@/contexts/AuthContext';
+import { 
+  fetchPrayerTimesByCity, 
+  fetchPrayerTimesByCoordinates, 
+  getCurrentPrayer, 
+  getNextPrayer, 
+  PrayerTimesData 
+} from '@/lib/aladhan-api';
 
 interface PrayerTime {
   name: string;
@@ -33,6 +39,7 @@ export default function Home() {
   const { user, userProfile } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
+  const [prayerData, setPrayerData] = useState<PrayerTimesData | null>(null);
 
   // Update current time every second
   useEffect(() => {
@@ -45,56 +52,126 @@ export default function Home() {
 
   // Calculate prayer times when location changes
   useEffect(() => {
-    if (location || (userProfile?.latitude && userProfile?.longitude)) {
-      const lat = location?.latitude || userProfile?.latitude || 21.4225; // Default to Mecca
-      const lng = location?.longitude || userProfile?.longitude || 39.8262;
-      
-      try {
-        const times = calculatePrayerTimes(lat, lng);
-        const currentPrayer = getCurrentPrayer(times);
-        const nextPrayer = getNextPrayer(times);
-        
-        setPrayerTimes([
-          { 
-            name: language === 'ar' ? 'الفجر' : 'Fajr', 
-            time: formatPrayerTime(times.fajr),
-            isNext: nextPrayer === 'fajr',
-            isCurrent: currentPrayer === 'fajr'
-          },
-          { 
-            name: language === 'ar' ? 'الشروق' : 'Sunrise', 
-            time: formatPrayerTime(times.sunrise),
-            isNext: false,
-            isCurrent: false
-          },
-          { 
-            name: language === 'ar' ? 'الظهر' : 'Dhuhr', 
-            time: formatPrayerTime(times.dhuhr),
-            isNext: nextPrayer === 'dhuhr',
-            isCurrent: currentPrayer === 'dhuhr'
-          },
-          { 
-            name: language === 'ar' ? 'العصر' : 'Asr', 
-            time: formatPrayerTime(times.asr),
-            isNext: nextPrayer === 'asr',
-            isCurrent: currentPrayer === 'asr'
-          },
-          { 
-            name: language === 'ar' ? 'المغرب' : 'Maghrib', 
-            time: formatPrayerTime(times.maghrib),
-            isNext: nextPrayer === 'maghrib',
-            isCurrent: currentPrayer === 'maghrib'
-          },
-          { 
-            name: language === 'ar' ? 'العشاء' : 'Isha', 
-            time: formatPrayerTime(times.isha),
-            isNext: nextPrayer === 'isha',
-            isCurrent: currentPrayer === 'isha'
-          },
-        ]);
-      } catch (error) {
-        console.error('Error calculating prayer times:', error);
-        // Fallback to mock data
+    const fetchPrayerTimes = async () => {
+      if (userProfile?.city && userProfile?.country) {
+        try {
+          const method = getMethodFromCountry(userProfile.country);
+          const data = await fetchPrayerTimesByCity(userProfile.city, userProfile.country, method);
+          setPrayerData(data);
+          
+          const currentPrayer = getCurrentPrayer(data);
+          const nextPrayer = getNextPrayer(data);
+          
+          setPrayerTimes([
+            { 
+              name: language === 'ar' ? 'الفجر' : 'Fajr', 
+              time: data.fajr,
+              isNext: nextPrayer === 'fajr',
+              isCurrent: currentPrayer === 'fajr'
+            },
+            { 
+              name: language === 'ar' ? 'الشروق' : 'Sunrise', 
+              time: data.sunrise,
+              isNext: false,
+              isCurrent: false
+            },
+            { 
+              name: language === 'ar' ? 'الظهر' : 'Dhuhr', 
+              time: data.dhuhr,
+              isNext: nextPrayer === 'dhuhr',
+              isCurrent: currentPrayer === 'dhuhr'
+            },
+            { 
+              name: language === 'ar' ? 'العصر' : 'Asr', 
+              time: data.asr,
+              isNext: nextPrayer === 'asr',
+              isCurrent: currentPrayer === 'asr'
+            },
+            { 
+              name: language === 'ar' ? 'المغرب' : 'Maghrib', 
+              time: data.maghrib,
+              isNext: nextPrayer === 'maghrib',
+              isCurrent: currentPrayer === 'maghrib'
+            },
+            { 
+              name: language === 'ar' ? 'العشاء' : 'Isha', 
+              time: data.isha,
+              isNext: nextPrayer === 'isha',
+              isCurrent: currentPrayer === 'isha'
+            },
+          ]);
+        } catch (error) {
+          console.error('Error fetching prayer times:', error);
+          // Fallback to mock data
+          setPrayerTimes([
+            { name: language === 'ar' ? 'الفجر' : 'Fajr', time: '5:30 AM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'الشروق' : 'Sunrise', time: '6:45 AM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'الظهر' : 'Dhuhr', time: '12:15 PM', isNext: true, isCurrent: false },
+            { name: language === 'ar' ? 'العصر' : 'Asr', time: '3:30 PM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'المغرب' : 'Maghrib', time: '6:20 PM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'العشاء' : 'Isha', time: '7:45 PM', isNext: false, isCurrent: false },
+          ]);
+        }
+      } else if (userProfile?.latitude && userProfile?.longitude) {
+        try {
+          const data = await fetchPrayerTimesByCoordinates(userProfile.latitude, userProfile.longitude, 8);
+          setPrayerData(data);
+          
+          const currentPrayer = getCurrentPrayer(data);
+          const nextPrayer = getNextPrayer(data);
+          
+          setPrayerTimes([
+            { 
+              name: language === 'ar' ? 'الفجر' : 'Fajr', 
+              time: data.fajr,
+              isNext: nextPrayer === 'fajr',
+              isCurrent: currentPrayer === 'fajr'
+            },
+            { 
+              name: language === 'ar' ? 'الشروق' : 'Sunrise', 
+              time: data.sunrise,
+              isNext: false,
+              isCurrent: false
+            },
+            { 
+              name: language === 'ar' ? 'الظهر' : 'Dhuhr', 
+              time: data.dhuhr,
+              isNext: nextPrayer === 'dhuhr',
+              isCurrent: currentPrayer === 'dhuhr'
+            },
+            { 
+              name: language === 'ar' ? 'العصر' : 'Asr', 
+              time: data.asr,
+              isNext: nextPrayer === 'asr',
+              isCurrent: currentPrayer === 'asr'
+            },
+            { 
+              name: language === 'ar' ? 'المغرب' : 'Maghrib', 
+              time: data.maghrib,
+              isNext: nextPrayer === 'maghrib',
+              isCurrent: currentPrayer === 'maghrib'
+            },
+            { 
+              name: language === 'ar' ? 'العشاء' : 'Isha', 
+              time: data.isha,
+              isNext: nextPrayer === 'isha',
+              isCurrent: currentPrayer === 'isha'
+            },
+          ]);
+        } catch (error) {
+          console.error('Error fetching prayer times:', error);
+          // Fallback to mock data
+          setPrayerTimes([
+            { name: language === 'ar' ? 'الفجر' : 'Fajr', time: '5:30 AM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'الشروق' : 'Sunrise', time: '6:45 AM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'الظهر' : 'Dhuhr', time: '12:15 PM', isNext: true, isCurrent: false },
+            { name: language === 'ar' ? 'العصر' : 'Asr', time: '3:30 PM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'المغرب' : 'Maghrib', time: '6:20 PM', isNext: false, isCurrent: false },
+            { name: language === 'ar' ? 'العشاء' : 'Isha', time: '7:45 PM', isNext: false, isCurrent: false },
+          ]);
+        }
+      } else {
+        // Default fallback data
         setPrayerTimes([
           { name: language === 'ar' ? 'الفجر' : 'Fajr', time: '5:30 AM', isNext: false, isCurrent: false },
           { name: language === 'ar' ? 'الشروق' : 'Sunrise', time: '6:45 AM', isNext: false, isCurrent: false },
@@ -104,8 +181,29 @@ export default function Home() {
           { name: language === 'ar' ? 'العشاء' : 'Isha', time: '7:45 PM', isNext: false, isCurrent: false },
         ]);
       }
-    }
-  }, [location, userProfile, language]);
+    };
+
+    fetchPrayerTimes();
+  }, [userProfile, language]);
+
+  const getMethodFromCountry = (country: string): number => {
+    const countryMethods: { [key: string]: number } = {
+      'Saudi Arabia': 4, // Umm Al-Qura
+      'UAE': 8, // Gulf Region
+      'Kuwait': 9,
+      'Qatar': 10,
+      'Egypt': 5,
+      'Pakistan': 1,
+      'India': 1,
+      'Turkey': 13,
+      'Singapore': 11,
+      'Malaysia': 11,
+      'Indonesia': 11,
+      'United States': 2,
+      'Canada': 2,
+    };
+    return countryMethods[country] || 3; // Default to Muslim World League
+  };
 
   const features = [
     {
