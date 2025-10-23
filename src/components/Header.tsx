@@ -52,7 +52,7 @@ const Header = () => {
     { 
       icon: Calendar, 
       label: language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar', 
-      href: '/calendar' 
+      href: '/islamic-calendar' 
     },
     { 
       icon: Compass, 
