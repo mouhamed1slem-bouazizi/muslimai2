@@ -7,8 +7,5 @@ Add Asma al Husna, Quran, Tafsir, Hadith, and Adhkar sections
 
 Implement audio player for 18 Quran reciters and radio stations
 
-Add Arabic and English language support with i18n
 
-Create Islamic AI chatbot for Q&A functionality
-
-Test responsiveness and deploy the application
+add option to save the history of chat in AI bot
