@@ -405,7 +405,9 @@ export default function IslamicCalendar() {
                 {state.calendarData.map((day, index) => {
                   const isSpecial = isSpecialDay(day);
                   const specialInfo = getSpecialDayInfo(day);
-                  const isToday = new Date().toDateString() === new Date(day.date.gregorian.date).toDateString();
+                  const isToday = day?.date?.gregorian?.date 
+                    ? new Date().toDateString() === new Date(day.date.gregorian.date).toDateString()
+                    : false;
 
                   return (
                     <div
@@ -428,7 +430,7 @@ export default function IslamicCalendar() {
                               : 'text-gray-900 dark:text-white'
                         }`}>
                           {state.calendarType === 'gregorian' 
-                            ? day.date.gregorian.day 
+                            ? day.date.gregorian?.day || ''
                             : day.date.hijri?.day || ''}
                         </div>
 
@@ -436,7 +438,7 @@ export default function IslamicCalendar() {
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           {state.calendarType === 'gregorian' 
                             ? day.date.hijri?.day || '' 
-                            : day.date.gregorian.day}
+                            : day.date.gregorian?.day || ''}
                         </div>
 
                         {/* Special Day Indicator */}
