@@ -26,6 +26,7 @@ import {
   getCalculationMethods,
   PrayerTimesData 
 } from '@/lib/aladhan-api';
+import { getCurrentDates, GregorianDate, HijriDate, formatDate, formatCountdownNumber, formatCurrentTime } from '@/lib/date-utils';
 
 interface PrayerTime {
   name: string;
@@ -55,6 +56,13 @@ export default function PrayerTimesPage() {
     minutes: 0,
     seconds: 0,
   });
+  const [currentDates, setCurrentDates] = useState<{
+    gregorian: GregorianDate | null;
+    hijri: HijriDate | null;
+  }>({
+    gregorian: null,
+    hijri: null,
+  });
 
   // Update current time every second
   useEffect(() => {
@@ -71,7 +79,18 @@ export default function PrayerTimesPage() {
   // Fetch prayer times when component mounts or user profile changes
   useEffect(() => {
     fetchPrayerTimes();
+    fetchCurrentDates();
   }, [userProfile]);
+
+  // Fetch current dates
+  const fetchCurrentDates = async () => {
+    try {
+      const dates = await getCurrentDates();
+      setCurrentDates(dates);
+    } catch (error) {
+      console.error('Error fetching current dates:', error);
+    }
+  };
 
   const fetchPrayerTimes = async () => {
     setLoading(true);
@@ -252,7 +271,7 @@ export default function PrayerTimesPage() {
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700 shadow-lg">
           <div className="text-center">
             <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
-              {currentTime.toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US')}
+              {formatCurrentTime(currentTime, language)}
             </div>
             
             {/* Gregorian Date */}
@@ -261,29 +280,34 @@ export default function PrayerTimesPage() {
                 {language === 'ar' ? 'التاريخ الميلادي' : 'Gregorian Date'}
               </div>
               <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                {currentTime.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+                {currentDates.gregorian ? (
+                  formatDate(currentDates.gregorian, language, false)
+                ) : (
+                  currentTime.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
+                )}
               </div>
             </div>
 
             {/* Hijri Date */}
-            {prayerData && (
-              <div className="mb-4">
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  {language === 'ar' ? 'التاريخ الهجري' : 'Hijri Date'}
-                </div>
-                <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                  {language === 'ar' 
-                    ? `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.ar} ${prayerData.date.hijri.year} هـ`
-                    : `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.en} ${prayerData.date.hijri.year} AH`
-                  }
-                </div>
+            <div className="mb-4">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                {language === 'ar' ? 'التاريخ الهجري' : 'Hijri Date'}
               </div>
-            )}
+              <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                {currentDates.hijri ? (
+                  formatDate(currentDates.hijri, language, true)
+                ) : (
+                  language === 'ar' 
+                    ? 'جاري التحميل...'
+                    : 'Loading...'
+                )}
+              </div>
+            </div>
             
             {/* Location */}
             {prayerData && (
@@ -311,9 +335,9 @@ export default function PrayerTimesPage() {
                 {getNextPrayerName()}
               </div>
               <div className="text-3xl font-mono">
-                {String(timeUntilNext.hours).padStart(2, '0')}:
-                {String(timeUntilNext.minutes).padStart(2, '0')}:
-                {String(timeUntilNext.seconds).padStart(2, '0')}
+                {formatCountdownNumber(timeUntilNext.hours, language)}:
+                {formatCountdownNumber(timeUntilNext.minutes, language)}:
+                {formatCountdownNumber(timeUntilNext.seconds, language)}
               </div>
               <div className="text-sm opacity-90 mt-2">
                 {language === 'ar' ? 'ساعة : دقيقة : ثانية' : 'Hours : Minutes : Seconds'}
