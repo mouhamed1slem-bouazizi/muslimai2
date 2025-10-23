@@ -103,16 +103,28 @@ export interface PrayerTimesData {
     hijri: {
       date: string;
       day: string;
-      month: string;
+      month: {
+        number: number;
+        en: string;
+        ar: string;
+      };
       year: string;
-      weekday: string;
+      weekday: {
+        en: string;
+        ar: string;
+      };
     };
     gregorian: {
       date: string;
       day: string;
-      month: string;
+      month: {
+        number: number;
+        en: string;
+      };
       year: string;
-      weekday: string;
+      weekday: {
+        en: string;
+      };
     };
   };
   location: {
@@ -163,16 +175,28 @@ export const fetchPrayerTimesByCity = async (
         hijri: {
           date: data.data.date.hijri.date,
           day: data.data.date.hijri.day,
-          month: data.data.date.hijri.month.ar,
+          month: {
+            number: data.data.date.hijri.month.number,
+            en: data.data.date.hijri.month.en,
+            ar: data.data.date.hijri.month.ar,
+          },
           year: data.data.date.hijri.year,
-          weekday: data.data.date.hijri.weekday.ar,
+          weekday: {
+            en: data.data.date.hijri.weekday.en,
+            ar: data.data.date.hijri.weekday.ar,
+          },
         },
         gregorian: {
           date: data.data.date.gregorian.date,
           day: data.data.date.gregorian.day,
-          month: data.data.date.gregorian.month.en,
+          month: {
+            number: data.data.date.gregorian.month.number,
+            en: data.data.date.gregorian.month.en,
+          },
           year: data.data.date.gregorian.year,
-          weekday: data.data.date.gregorian.weekday.en,
+          weekday: {
+            en: data.data.date.gregorian.weekday.en,
+          },
         },
       },
       location: {
@@ -228,16 +252,28 @@ export const fetchPrayerTimesByCoordinates = async (
         hijri: {
           date: data.data.date.hijri.date,
           day: data.data.date.hijri.day,
-          month: data.data.date.hijri.month.ar,
+          month: {
+            number: data.data.date.hijri.month.number,
+            en: data.data.date.hijri.month.en,
+            ar: data.data.date.hijri.month.ar,
+          },
           year: data.data.date.hijri.year,
-          weekday: data.data.date.hijri.weekday.ar,
+          weekday: {
+            en: data.data.date.hijri.weekday.en,
+            ar: data.data.date.hijri.weekday.ar,
+          },
         },
         gregorian: {
           date: data.data.date.gregorian.date,
           day: data.data.date.gregorian.day,
-          month: data.data.date.gregorian.month.en,
+          month: {
+            number: data.data.date.gregorian.month.number,
+            en: data.data.date.gregorian.month.en,
+          },
           year: data.data.date.gregorian.year,
-          weekday: data.data.date.gregorian.weekday.en,
+          weekday: {
+            en: data.data.date.gregorian.weekday.en,
+          },
         },
       },
       location: {

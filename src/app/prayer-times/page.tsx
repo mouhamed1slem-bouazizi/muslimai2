@@ -251,39 +251,49 @@ export default function PrayerTimesPage() {
         {/* Current Time and Date */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-200 dark:border-gray-700 shadow-lg">
           <div className="text-center">
-            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
               {currentTime.toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US')}
             </div>
-            <div className="text-gray-600 dark:text-gray-400 mb-4">
-              {currentTime.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </div>
             
+            {/* Gregorian Date */}
+            <div className="mb-4">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                {language === 'ar' ? 'التاريخ الميلادي' : 'Gregorian Date'}
+              </div>
+              <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                {currentTime.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </div>
+            </div>
+
+            {/* Hijri Date */}
             {prayerData && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="text-center">
-                  <div className="text-gray-500 dark:text-gray-400 mb-1">
-                    {language === 'ar' ? 'التاريخ الهجري' : 'Hijri Date'}
-                  </div>
-                  <div className="font-semibold text-gray-800 dark:text-gray-200">
-                    {language === 'ar' 
-                      ? `${prayerData.date.hijri.day} ${prayerData.date.hijri.month} ${prayerData.date.hijri.year}`
-                      : prayerData.date.gregorian.date
-                    }
-                  </div>
+              <div className="mb-4">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  {language === 'ar' ? 'التاريخ الهجري' : 'Hijri Date'}
                 </div>
-                <div className="text-center">
-                  <div className="text-gray-500 dark:text-gray-400 mb-1">
-                    {language === 'ar' ? 'الموقع' : 'Location'}
-                  </div>
-                  <div className="font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {prayerData.location.city}, {prayerData.location.country}
-                  </div>
+                <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                  {language === 'ar' 
+                    ? `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.ar} ${prayerData.date.hijri.year} هـ`
+                    : `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.en} ${prayerData.date.hijri.year} AH`
+                  }
+                </div>
+              </div>
+            )}
+            
+            {/* Location */}
+            {prayerData && (
+              <div className="text-center">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  {language === 'ar' ? 'الموقع' : 'Location'}
+                </div>
+                <div className="font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  {prayerData.location.city}, {prayerData.location.country}
                 </div>
               </div>
             )}
