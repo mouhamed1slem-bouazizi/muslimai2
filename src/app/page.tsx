@@ -30,7 +30,7 @@ interface PrayerTime {
 
 export default function Home() {
   const { language, theme, location } = useApp();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
 
@@ -45,9 +45,9 @@ export default function Home() {
 
   // Calculate prayer times when location changes
   useEffect(() => {
-    if (location || (user?.latitude && user?.longitude)) {
-      const lat = location?.latitude || user?.latitude || 21.4225; // Default to Mecca
-      const lng = location?.longitude || user?.longitude || 39.8262;
+    if (location || (userProfile?.latitude && userProfile?.longitude)) {
+      const lat = location?.latitude || userProfile?.latitude || 21.4225; // Default to Mecca
+      const lng = location?.longitude || userProfile?.longitude || 39.8262;
       
       try {
         const times = calculatePrayerTimes(lat, lng);
@@ -105,7 +105,7 @@ export default function Home() {
         ]);
       }
     }
-  }, [location, user, language]);
+  }, [location, userProfile, language]);
 
   const features = [
     {
@@ -192,7 +192,7 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {prayerTimes.map((prayer, index) => {
-              const getPrayerIcon = (name) => {
+              const getPrayerIcon = (name: string) => {
                 if (name.includes('Fajr') || name.includes('الفجر')) return Sunrise;
                 if (name.includes('Sunrise') || name.includes('الشروق')) return Sun;
                 if (name.includes('Dhuhr') || name.includes('الظهر')) return Sun;
@@ -254,13 +254,13 @@ export default function Home() {
           </div>
           
           {/* Location Info */}
-          {(location || user?.city) && (
+          {(location || userProfile?.city) && (
             <div className="mt-6 text-center">
               <div className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-200 dark:border-gray-700">
                 <MapPin className="w-4 h-4" />
                 <span>
-                  {user?.city && user?.country 
-                    ? `${user.city}, ${user.country}`
+                  {userProfile?.city && userProfile?.country 
+                    ? `${userProfile.city}, ${userProfile.country}`
                     : (language === 'ar' ? 'الموقع الحالي' : 'Current Location')
                   }
                 </span>

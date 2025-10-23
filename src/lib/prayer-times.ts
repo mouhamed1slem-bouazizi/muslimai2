@@ -18,9 +18,9 @@ export interface PrayerTimesData {
 }
 
 export interface PrayerTimesOptions {
-  calculationMethod?: CalculationMethod;
-  madhab?: Madhab;
-  highLatitudeRule?: HighLatitudeRule;
+  calculationMethod?: any;
+  madhab?: any;
+  highLatitudeRule?: any;
   adjustments?: {
     fajr?: number;
     sunrise?: number;
@@ -43,7 +43,7 @@ export const calculatePrayerTimes = (
   const coordinates = new Coordinates(latitude, longitude);
   
   // Default calculation method (can be customized based on user location/preference)
-  const calculationMethod = options.calculationMethod || CalculationMethod.MuslimWorldLeague;
+  const calculationMethod = options.calculationMethod || CalculationMethod.MuslimWorldLeague();
   
   // Create calculation parameters
   const params = calculationMethod;
@@ -83,9 +83,9 @@ export const calculatePrayerTimes = (
 /**
  * Get current prayer based on current time
  */
-export const getCurrentPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = new Date()): Prayer | null => {
+export const getCurrentPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = new Date()): any | null => {
   const coordinates = new Coordinates(0, 0); // Dummy coordinates for Prayer enum
-  const params = CalculationMethod.MuslimWorldLeague;
+  const params = CalculationMethod.MuslimWorldLeague();
   const prayers = new PrayerTimes(coordinates, currentTime, params);
   
   return prayers.currentPrayer(currentTime);
@@ -94,9 +94,9 @@ export const getCurrentPrayer = (prayerTimes: PrayerTimesData, currentTime: Date
 /**
  * Get next prayer based on current time
  */
-export const getNextPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = new Date()): Prayer | null => {
+export const getNextPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = new Date()): any | null => {
   const coordinates = new Coordinates(0, 0); // Dummy coordinates for Prayer enum
-  const params = CalculationMethod.MuslimWorldLeague;
+  const params = CalculationMethod.MuslimWorldLeague();
   const prayers = new PrayerTimes(coordinates, currentTime, params);
   
   return prayers.nextPrayer(currentTime);
@@ -106,7 +106,7 @@ export const getNextPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = 
  * Get time remaining until next prayer
  */
 export const getTimeUntilNextPrayer = (prayerTimes: PrayerTimesData, currentTime: Date = new Date()): {
-  prayer: Prayer | null;
+  prayer: any | null;
   timeRemaining: number; // in milliseconds
   hours: number;
   minutes: number;
@@ -190,8 +190,8 @@ export const formatPrayerTime = (time: Date, format24Hour: boolean = false): str
 /**
  * Get prayer name in Arabic and English
  */
-export const getPrayerName = (prayer: Prayer, language: 'en' | 'ar' = 'en'): string => {
-  const names = {
+export const getPrayerName = (prayer: any, language: 'en' | 'ar' = 'en'): string => {
+  const names: any = {
     [Prayer.Fajr]: { en: 'Fajr', ar: 'الفجر' },
     [Prayer.Dhuhr]: { en: 'Dhuhr', ar: 'الظهر' },
     [Prayer.Asr]: { en: 'Asr', ar: 'العصر' },
@@ -205,45 +205,45 @@ export const getPrayerName = (prayer: Prayer, language: 'en' | 'ar' = 'en'): str
 /**
  * Get calculation method name
  */
-export const getCalculationMethodName = (method: CalculationMethod, language: 'en' | 'ar' = 'en'): string => {
-  const methods = {
-    [CalculationMethod.MuslimWorldLeague]: {
+export const getCalculationMethodName = (method: any, language: 'en' | 'ar' = 'en'): string => {
+  const methods: any = {
+    'MuslimWorldLeague': {
       en: 'Muslim World League',
       ar: 'رابطة العالم الإسلامي'
     },
-    [CalculationMethod.Egyptian]: {
+    'Egyptian': {
       en: 'Egyptian General Authority',
       ar: 'الهيئة المصرية العامة للمساحة'
     },
-    [CalculationMethod.Karachi]: {
+    'Karachi': {
       en: 'University of Islamic Sciences, Karachi',
       ar: 'جامعة العلوم الإسلامية، كراتشي'
     },
-    [CalculationMethod.UmmAlQura]: {
+    'UmmAlQura': {
       en: 'Umm Al-Qura University, Makkah',
       ar: 'جامعة أم القرى، مكة'
     },
-    [CalculationMethod.Dubai]: {
+    'Dubai': {
       en: 'Dubai',
       ar: 'دبي'
     },
-    [CalculationMethod.MoonsightingCommittee]: {
+    'MoonsightingCommittee': {
       en: 'Moonsighting Committee Worldwide',
       ar: 'لجنة رؤية الهلال العالمية'
     },
-    [CalculationMethod.NorthAmerica]: {
+    'NorthAmerica': {
       en: 'Islamic Society of North America',
       ar: 'الجمعية الإسلامية لأمريكا الشمالية'
     },
-    [CalculationMethod.Kuwait]: {
+    'Kuwait': {
       en: 'Kuwait',
       ar: 'الكويت'
     },
-    [CalculationMethod.Qatar]: {
+    'Qatar': {
       en: 'Qatar',
       ar: 'قطر'
     },
-    [CalculationMethod.Singapore]: {
+    'Singapore': {
       en: 'Singapore',
       ar: 'سنغافورة'
     },
@@ -255,31 +255,31 @@ export const getCalculationMethodName = (method: CalculationMethod, language: 'e
 /**
  * Get recommended calculation method based on country
  */
-export const getRecommendedCalculationMethod = (country: string): CalculationMethod => {
-  const countryMethods: { [key: string]: CalculationMethod } = {
+export const getRecommendedCalculationMethod = (country: string): any => {
+  const countryMethods: { [key: string]: any } = {
     // Middle East
-    'Saudi Arabia': CalculationMethod.UmmAlQura,
-    'UAE': CalculationMethod.Dubai,
-    'Kuwait': CalculationMethod.Kuwait,
-    'Qatar': CalculationMethod.Qatar,
-    'Egypt': CalculationMethod.Egyptian,
+    'Saudi Arabia': 'UmmAlQura',
+    'UAE': 'Dubai',
+    'Kuwait': 'Kuwait',
+    'Qatar': 'Qatar',
+    'Egypt': 'Egyptian',
     
     // South Asia
-    'Pakistan': CalculationMethod.Karachi,
-    'India': CalculationMethod.Karachi,
-    'Bangladesh': CalculationMethod.Karachi,
+    'Pakistan': 'Karachi',
+    'India': 'Karachi',
+    'Bangladesh': 'Karachi',
     
     // North America
-    'United States': CalculationMethod.NorthAmerica,
-    'Canada': CalculationMethod.NorthAmerica,
+    'United States': 'NorthAmerica',
+    'Canada': 'NorthAmerica',
     
     // Southeast Asia
-    'Singapore': CalculationMethod.Singapore,
-    'Malaysia': CalculationMethod.Singapore,
-    'Indonesia': CalculationMethod.Singapore,
+    'Singapore': 'Singapore',
+    'Malaysia': 'Singapore',
+    'Indonesia': 'Singapore',
     
     // Default for other countries
   };
   
-  return countryMethods[country] || CalculationMethod.MuslimWorldLeague;
+  return countryMethods[country] || 'MuslimWorldLeague';
 };

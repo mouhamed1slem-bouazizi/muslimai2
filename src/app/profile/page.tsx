@@ -54,7 +54,7 @@ export default function ProfilePage() {
 
     // Pre-fill form with existing data
     if (userProfile) {
-      setValue('name', userProfile.name || user.displayName || '');
+      setValue('name', userProfile.displayName || user.displayName || '');
       setValue('email', user.email || '');
       setValue('city', userProfile.city || '');
       setValue('country', userProfile.country || '');
@@ -65,7 +65,7 @@ export default function ProfilePage() {
     setIsLoading(true);
     try {
       await updateUserProfile({
-        name: data.name,
+        displayName: data.name,
         city: data.city,
         country: data.country,
       });
@@ -173,7 +173,7 @@ export default function ProfilePage() {
               <h2 className={`text-xl font-semibold ${
                 theme === 'dark' ? 'text-white' : 'text-gray-800'
               }`}>
-                {user.name || 'User'}
+                {userProfile?.displayName || user.displayName || 'User'}
               </h2>
               <p className={`${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-600'

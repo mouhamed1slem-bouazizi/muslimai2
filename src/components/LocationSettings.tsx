@@ -40,9 +40,16 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
     setIsDetecting(true);
     try {
       const location = await getCompleteLocation();
-      setCurrentLocation(location);
-      setManualCity(location.city);
-      setManualCountry(location.country);
+      if (location.city && location.country) {
+        setCurrentLocation({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          city: location.city,
+          country: location.country
+        });
+        setManualCity(location.city);
+        setManualCountry(location.country);
+      }
       
       toast.success(
         language === 'ar' 
