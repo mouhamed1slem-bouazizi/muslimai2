@@ -1,18 +1,19 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  User,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  User, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
   onAuthStateChanged,
-  updateProfile,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  updateProfile
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { syncService, SyncCallbacks } from '@/lib/sync-service';
 import toast from 'react-hot-toast';
 
 interface UserProfile {
@@ -47,12 +48,15 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  isOnline: boolean;
+  pendingUpdates: number;
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateUserProfile: (updates: Partial<UserProfile>) => Promise<void>;
   updateLocation: (city: string, country: string, latitude?: number, longitude?: number) => Promise<void>;
+  forceSyncPendingUpdates: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,14 +73,101 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
+  const [pendingUpdates, setPendingUpdates] = useState(0);
+
+  // Sync service callbacks
+  const syncCallbacks: SyncCallbacks = {
+    onProfileUpdate: (profile: UserProfile) => {
+      setUserProfile(profile);
+    },
+    onLocationUpdate: (location) => {
+      if (userProfile) {
+        setUserProfile(prev => prev ? {
+          ...prev,
+          city: location.city || prev.city,
+          country: location.country || prev.country,
+          latitude: location.latitude || prev.latitude,
+          longitude: location.longitude || prev.longitude,
+        } : null);
+      }
+    },
+    onPreferencesUpdate: (preferences) => {
+      if (userProfile) {
+        setUserProfile(prev => prev ? {
+          ...prev,
+          preferences: preferences || prev.preferences,
+        } : null);
+      }
+    },
+    onThemeUpdate: (theme) => {
+      if (userProfile) {
+        setUserProfile(prev => prev ? {
+          ...prev,
+          theme,
+        } : null);
+      }
+    },
+    onLanguageUpdate: (language) => {
+      if (userProfile) {
+        setUserProfile(prev => prev ? {
+          ...prev,
+          language,
+        } : null);
+      }
+    },
+    onError: (error) => {
+      console.error('Sync error:', error);
+      toast.error('Sync error: ' + error.message);
+    }
+  };
+
+  useEffect(() => {
+    // Monitor online/offline status
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success('Back online - syncing data...');
+    };
+    
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.error('You are offline - changes will sync when online');
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      setIsOnline(navigator.onLine);
+
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Update pending updates count
+    const updatePendingCount = () => {
+      setPendingUpdates(syncService.getPendingUpdatesCount());
+    };
+
+    const interval = setInterval(updatePendingCount, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
       if (user) {
+        setUser(user);
         await loadUserProfile(user.uid);
+        // Initialize sync service
+        syncService.initialize(user, syncCallbacks);
       } else {
+        setUser(null);
         setUserProfile(null);
+        // Cleanup sync service
+        syncService.cleanup();
       }
       setLoading(false);
     });
@@ -180,46 +271,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user || !userProfile) return;
 
     try {
-      const userRef = doc(db, 'users', user.uid);
-      const updatedData = {
-        ...updates,
-        updatedAt: new Date(),
-      };
-
-      await updateDoc(userRef, updatedData);
-      
-      setUserProfile(prev => prev ? {
-        ...prev,
-        ...updates,
-        updatedAt: new Date(),
-      } : null);
-
+      // Use sync service for real-time updates
+      await syncService.updateProfile(updates);
       toast.success('Profile updated successfully!');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile');
-      throw error;
+      // Handle offline scenario
+      if (error.message.includes('Offline')) {
+        toast.error('Offline - changes will sync when online');
+      } else {
+        toast.error(error.message || 'Failed to update profile');
+        throw error;
+      }
     }
   };
 
   const updateLocation = async (city: string, country: string, latitude?: number, longitude?: number) => {
-    await updateUserProfile({
-      city,
-      country,
-      latitude,
-      longitude,
-    });
+    try {
+      await syncService.updateLocation(city, country, latitude, longitude);
+      toast.success('Location updated successfully!');
+    } catch (error: any) {
+      if (error.message.includes('Offline')) {
+        toast.error('Offline - location will sync when online');
+      } else {
+        toast.error(error.message || 'Failed to update location');
+        throw error;
+      }
+    }
+  };
+
+  const forceSyncPendingUpdates = async () => {
+    try {
+      await syncService.forceSyncPendingUpdates();
+      toast.success('All changes synced successfully!');
+    } catch (error: any) {
+      toast.error('Failed to sync pending changes');
+      throw error;
+    }
   };
 
   const value: AuthContextType = {
     user,
     userProfile,
     loading,
+    isOnline,
+    pendingUpdates,
     signup,
     login,
     loginWithGoogle,
     logout,
     updateUserProfile,
     updateLocation,
+    forceSyncPendingUpdates,
   };
 
   return (

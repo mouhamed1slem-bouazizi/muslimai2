@@ -55,6 +55,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
         showSeconds
       };
 
+      // Use the sync service through AuthContext
       await updateUserProfile({ preferences });
       
       if (onPreferencesUpdate) {
@@ -68,11 +69,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
       );
     } catch (error) {
       console.error('Failed to save preferences:', error);
-      toast.error(
-        language === 'ar' 
-          ? 'فشل في حفظ التفضيلات' 
-          : 'Failed to save preferences'
-      );
+      // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);
     }

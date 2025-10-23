@@ -69,50 +69,26 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
   };
 
   const handleManualUpdate = async () => {
-    if (!manualCity.trim() || !manualCountry.trim()) {
-      toast.error(
-        language === 'ar' 
-          ? 'يرجى إدخال المدينة والدولة' 
-          : 'Please enter both city and country'
-      );
-      return;
-    }
-
+    if (!manualCity.trim() || !manualCountry.trim()) return;
+    
     setIsUpdating(true);
     try {
-      // For manual entry, we'll use a geocoding service to get coordinates
-      // For now, we'll save without coordinates and let the prayer times use a default
-      const locationData = {
-        city: manualCity.trim(),
-        country: manualCountry.trim(),
-        latitude: currentLocation?.latitude || 0,
-        longitude: currentLocation?.longitude || 0
-      };
-
-      await updateLocation(
-        locationData.city,
-        locationData.country,
-        locationData.latitude,
-        locationData.longitude
-      );
-      setCurrentLocation(locationData);
+      // Use the sync service through AuthContext
+      await updateLocation(manualCity.trim(), manualCountry.trim());
       
       if (onLocationUpdate) {
-        onLocationUpdate(locationData);
+        onLocationUpdate({
+          latitude: 0, // Will be geocoded later if needed
+          longitude: 0,
+          city: manualCity.trim(),
+          country: manualCountry.trim()
+        });
       }
 
-      toast.success(
-        language === 'ar' 
-          ? 'تم حفظ الموقع بنجاح' 
-          : 'Location saved successfully'
-      );
+      // Success message is handled in AuthContext
     } catch (error) {
-      console.error('Failed to update location:', error);
-      toast.error(
-        language === 'ar' 
-          ? 'فشل في حفظ الموقع' 
-          : 'Failed to save location'
-      );
+      console.error('Failed to save manual location:', error);
+      // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);
     }
@@ -123,6 +99,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
     
     setIsUpdating(true);
     try {
+      // Use the sync service through AuthContext
       await updateLocation(
         currentLocation.city,
         currentLocation.country,
@@ -134,18 +111,10 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
         onLocationUpdate(currentLocation);
       }
 
-      toast.success(
-        language === 'ar' 
-          ? 'تم حفظ الموقع بنجاح' 
-          : 'Location saved successfully'
-      );
+      // Success message is handled in AuthContext
     } catch (error) {
       console.error('Failed to save GPS location:', error);
-      toast.error(
-        language === 'ar' 
-          ? 'فشل في حفظ الموقع' 
-          : 'Failed to save location'
-      );
+      // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);
     }

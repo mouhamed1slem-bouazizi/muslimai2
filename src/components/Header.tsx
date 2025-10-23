@@ -17,8 +17,10 @@ import {
   Volume2,
   MessageCircle,
   User,
-  LogOut
+  LogOut,
+  Settings
 } from 'lucide-react';
+import SyncStatus from './SyncStatus';
 
 const Header = () => {
   const { language, setLanguage, theme, setTheme } = useApp();
@@ -107,6 +109,9 @@ const Header = () => {
 
           {/* Controls */}
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            {/* Sync Status */}
+            {user && <SyncStatus />}
+            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
