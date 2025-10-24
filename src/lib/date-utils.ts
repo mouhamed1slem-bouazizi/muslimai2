@@ -83,6 +83,12 @@ const convertToRegularNumerals = (text: string): string => {
   return result;
 };
 
+// Add: helper to format numeric strings for selected language
+export function formatNumberForLanguage(text: string | number, language: 'en' | 'ar'): string {
+  const s = String(text);
+  return language === 'ar' ? convertToRegularNumerals(s) : s;
+}
+
 /**
  * Format countdown timer numbers for Arabic display (using regular numerals)
  */

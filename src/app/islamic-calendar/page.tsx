@@ -32,7 +32,7 @@ import {
   NextHijriHoliday,
   CalendarDay
 } from '@/lib/aladhan-islamic-calendar-api';
-import { convertGregorianToHijri, convertHijriToGregorian } from '@/lib/date-utils';
+import { convertGregorianToHijri, convertHijriToGregorian, formatNumberForLanguage } from '@/lib/date-utils';
 import { logger } from '@/lib/logger';
 
 interface CalendarState {
@@ -391,7 +391,7 @@ export default function IslamicCalendar() {
               {language === 'ar' ? 'السنة الهجرية الحالية' : 'Current Hijri Year'}
             </h3>
             <div className="text-3xl font-bold text-emerald-600 font-mono">
-              {state.currentIslamicYear}
+              {formatNumberForLanguage(state.currentIslamicYear, language)}
             </div>
           </div>
 
@@ -407,7 +407,7 @@ export default function IslamicCalendar() {
               {state.currentMonthName ? (language === 'ar' ? state.currentMonthName.ar : state.currentMonthName.en) : ''}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {language === 'ar' ? `الشهر ${state.currentIslamicMonth}` : `Month ${state.currentIslamicMonth}`}
+              {language === 'ar' ? `الشهر ${formatNumberForLanguage(state.currentIslamicMonth, language)}` : `Month ${state.currentIslamicMonth}`}
             </div>
           </div>
 
@@ -422,7 +422,7 @@ export default function IslamicCalendar() {
             <div className="text-lg font-bold text-purple-600 font-amiri mb-1">
               {typeof state.ramadanDaysRemaining === 'number' ? (
                 language === 'ar'
-                  ? `بداية رمضان بعد ${state.ramadanDaysRemaining} ${formatDaysAr(state.ramadanDaysRemaining)}`
+                  ? `بداية رمضان بعد ${formatNumberForLanguage(state.ramadanDaysRemaining, language)} ${formatDaysAr(state.ramadanDaysRemaining)}`
                   : `Ramadan begins in ${state.ramadanDaysRemaining} days`
               ) : (
                 language === 'ar' ? 'غير متوفر مؤقتًا' : 'Temporarily unavailable'
@@ -475,7 +475,7 @@ export default function IslamicCalendar() {
               
               <div className="text-center min-w-[200px]">
                 <div className="text-xl font-bold text-gray-900 dark:text-white font-amiri">
-                  {getMonthName(state.selectedMonth, state.calendarType)} {state.selectedYear}
+                  {getMonthName(state.selectedMonth, state.calendarType)} {formatNumberForLanguage(state.selectedYear, language)}
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   {state.calendarType === 'gregorian' 
@@ -548,15 +548,15 @@ export default function IslamicCalendar() {
                               : 'text-gray-900 dark:text-white'
                         }`}>
                           {state.calendarType === 'gregorian' 
-                            ? (day?.date?.gregorian?.day ?? '')
-                            : (day?.date?.hijri?.day ?? '')}
+                            ? formatNumberForLanguage(day?.date?.gregorian?.day ?? '', language)
+                            : formatNumberForLanguage(day?.date?.hijri?.day ?? '', language)}
                         </div>
 
                         {/* Secondary Date */}
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           {state.calendarType === 'gregorian' 
-                            ? (day?.date?.hijri?.day ?? '') 
-                            : (day?.date?.gregorian?.day ?? '')}
+                            ? formatNumberForLanguage(day?.date?.hijri?.day ?? '', language)
+                            : formatNumberForLanguage(day?.date?.gregorian?.day ?? '', language)}
                         </div>
 
                         {/* Special day badge inside cell */}
@@ -643,7 +643,7 @@ export default function IslamicCalendar() {
                   <div className="flex items-center gap-3 mb-2">
                     <Star className="w-5 h-5" />
                     <div className="text-sm font-medium">
-                      {language === 'ar' ? `${day.day} ${state.islamicMonths.find(m => m.number === day.month)?.ar}` 
+                      {language === 'ar' ? `${formatNumberForLanguage(day.day, language)} ${state.islamicMonths.find(m => m.number === day.month)?.ar}` 
                                          : `${day.day} ${state.islamicMonths.find(m => m.number === day.month)?.en}`}
                     </div>
                   </div>
