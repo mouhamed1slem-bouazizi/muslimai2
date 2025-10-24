@@ -528,28 +528,33 @@ export default function IslamicCalendar() {
 
                      return (
                     <div
-                      key={index}
-                      className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                        isToday
-                          ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700'
-                          : isSpecial
-                            ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700'
-                            : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                      onClick={() => handleDayClick(day)}
-                    >
-                      <div className="text-center">
+                       key={index}
+                       className={`relative p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                         isToday
+                           ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 ring-2 ring-emerald-500 dark:ring-emerald-400'
+                           : isSpecial
+                             ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700'
+                             : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                       }`}
+                       onClick={() => handleDayClick(day)}
+                     >
+                       {isToday && (
+                         <div className="absolute top-1 right-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500 text-white dark:bg-emerald-600">
+                           {language === 'ar' ? 'اليوم' : 'Today'}
+                         </div>
+                       )}
+                       <div className="text-center">
                         {/* Primary Date */}
-                        <div className={`text-lg font-bold mb-1 ${
-                          isToday
-                            ? 'text-emerald-700 dark:text-emerald-300'
-                            : isSpecial
-                              ? 'text-purple-700 dark:text-purple-300'
-                              : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {state.calendarType === 'gregorian' 
-                            ? formatNumberForLanguage(day?.date?.gregorian?.day ?? '', language)
-                            : formatNumberForLanguage(day?.date?.hijri?.day ?? '', language)}
+                         <div className={`text-lg font-extrabold mb-1 ${
+                           isToday
+                             ? 'text-emerald-700 dark:text-emerald-300'
+                             : isSpecial
+                               ? 'text-purple-700 dark:text-purple-300'
+                               : 'text-gray-900 dark:text-white'
+                         }`}>
+                           {state.calendarType === 'gregorian' 
+                             ? formatNumberForLanguage(day?.date?.gregorian?.day ?? '', language)
+                             : formatNumberForLanguage(day?.date?.hijri?.day ?? '', language)}
                         </div>
 
                         {/* Secondary Date */}
