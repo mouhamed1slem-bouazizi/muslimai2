@@ -51,6 +51,9 @@ interface CalendarState {
   ramadanDaysRemaining?: number | null;
   ramadanTargetGregorianDate?: string | null;
   ramadanTargetHijriDate?: string | null;
+  // Added for click handling
+  selectedDay: CalendarDay | null;
+  selectedSpecial: SpecialDay | null;
 }
 
 export default function IslamicCalendar() {
@@ -68,7 +71,9 @@ export default function IslamicCalendar() {
     selectedYear: new Date().getFullYear(),
     calendarType: 'gregorian',
     loading: true,
-    error: null
+    error: null,
+    selectedDay: null,
+    selectedSpecial: null,
   });
 
   // Update current time every second
@@ -267,12 +272,18 @@ export default function IslamicCalendar() {
       if (!hijriDayStr || !hijriMonthNum) return null;
       const hijriDay = parseInt(hijriDayStr);
       const hijriMonth = hijriMonthNum;
-      return (Array.isArray(state.specialDays)
+      // Prefer explicit specialDays list; fallback to holidays array if present
+      const fromSpecialDays = (Array.isArray(state.specialDays)
         ? state.specialDays.find(
             (special) => typeof special.day === 'number' && typeof special.month === 'number' &&
               special.day === hijriDay && special.month === hijriMonth
           )
         : null) || null;
+      if (fromSpecialDays) return fromSpecialDays;
+      const holidayName = (day?.date?.hijri?.holidays || [])[0];
+      return holidayName
+        ? ({ day: hijriDay, month: hijriMonth, name: { en: holidayName, ar: holidayName }, type: 'holiday' } as SpecialDay)
+        : null;
     } catch (e) {
       return null;
     }
@@ -281,6 +292,12 @@ export default function IslamicCalendar() {
   // Back-compat alias to avoid stale chunk references
   const getSpecialDayInfo = (day: CalendarDay) => {
     return getSpecialHijriDayInfo(day);
+  };
+
+  // Handle grid cell click to show special-day details
+  const handleDayClick = (day: CalendarDay) => {
+    const special = getSpecialHijriDayInfo(day);
+    setState(prev => ({ ...prev, selectedDay: day, selectedSpecial: special }));
   };
 
   if (state.loading && state.islamicMonths.length === 0) {
@@ -496,6 +513,7 @@ export default function IslamicCalendar() {
                             ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700'
                             : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
+                      onClick={() => handleDayClick(day)}
                     >
                       <div className="text-center">
                         {/* Primary Date */}
@@ -518,17 +536,15 @@ export default function IslamicCalendar() {
                             : (day?.date?.gregorian?.day ?? '')}
                         </div>
 
-                        {/* Special Day Indicator */}
-                        {isSpecial && specialInfo && (
-                          <div className="flex items-center justify-center">
-                            <Sparkles className="w-3 h-3 text-purple-600" />
-                          </div>
-                        )}
-
-                        {/* Today Indicator */}
-                        {isToday && (
-                          <div className="text-xs mt-1 px-2 py-1 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200">
-                            {language === 'ar' ? 'اليوم' : 'Today'}
+                        {/* Special day badge inside cell */}
+                        {isSpecial && (
+                          <div className="mt-2 inline-flex items-center gap-1 text-xs text-purple-700 dark:text-purple-300">
+                            <Star className="w-3 h-3" />
+                            <span>
+                              {language === 'ar'
+                                ? (specialInfo?.name?.ar || specialInfo?.name?.en || '')
+                                : (specialInfo?.name?.en || specialInfo?.name?.ar || '')}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -551,6 +567,42 @@ export default function IslamicCalendar() {
               </div>
             </>
           )}
+        </div>
+
+        {/* Selected Day Detail Panel */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="max-w-7xl mx-auto">
+            {state.selectedDay ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {language === 'ar' ? 'التاريخ الميلادي' : 'Gregorian Date'}: {state.selectedDay?.date?.gregorian?.date}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {language === 'ar' ? 'التاريخ الهجري' : 'Hijri Date'}: {state.selectedDay?.date?.hijri?.date}
+                  </div>
+                </div>
+                <div>
+                  {state.selectedSpecial ? (
+                    <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                      <Star className="w-4 h-4" />
+                      <span className="font-medium">
+                        {language === 'ar' ? (state.selectedSpecial.name.ar || state.selectedSpecial.name.en) : (state.selectedSpecial.name.en || state.selectedSpecial.name.ar)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-gray-700 dark:text-gray-300">
+                      {language === 'ar' ? 'لا توجد مناسبة خاصة لهذا اليوم' : 'No special day for this date'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-600 dark:text-gray-400 text-sm">
+                {language === 'ar' ? 'اضغط على أي يوم لعرض التفاصيل' : 'Click any day to view details'}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Special Days List */}
