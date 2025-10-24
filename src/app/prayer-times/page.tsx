@@ -15,7 +15,8 @@ import {
   RefreshCw,
   Settings,
   ChevronRight,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 import { 
   fetchPrayerTimesByCity, 
@@ -70,6 +71,8 @@ export default function PrayerTimesPage() {
     gregorian: null,
     hijri: null,
   });
+
+  const [showFajrInfo, setShowFajrInfo] = useState(false);
 
   // Update current time every second
   useEffect(() => {
@@ -263,6 +266,66 @@ export default function PrayerTimesPage() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
       
+      {showFajrInfo && (
+        <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4">
+          <div
+            className="relative w-full max-w-3xl rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl bg-cover bg-center overflow-hidden"
+            style={{ backgroundImage: `url(${PIC_Fajr.src})` }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={language === 'ar' ? 'معلومات سنة الفجر' : 'Fajr Sunnah Information'}
+          >
+            <button
+              onClick={() => setShowFajrInfo(false)}
+              className="absolute top-3 right-3 inline-flex items-center justify-center rounded-full p-2 bg-black/40 hover:bg-black/60 text-white transition"
+              aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="bg-black/40 dark:bg-black/50 p-6 md:p-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 font-amiri">
+                {language === 'ar' ? 'سنة الفجر' : 'Sunnah of Fajr'}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">العربية</h3>
+                  <p className="leading-relaxed">
+                    النافلة الوحيدة المؤكدة قبل صلاة الفجر هي ركعتا سنة الفجر، وتُسمى أيضًا الراتبة القبلية لصلاة الفجر أو رغيبة الفجر.
+                    <br />
+                    الحكم: هي آكد السنن الرواتب وأفضلها، وسنة مؤكدة باتفاق الجمهور.
+                    <br />
+                    الوقت: تُصلى بعد دخول وقت الفجر الصادق (الأذان الثاني) وقبل إقامة صلاة الفجر.
+                    <br />
+                    العدد: ركعتان خفيفتان.
+                    <br />
+                    الفضل: قال عنها النبي صلى الله عليه وسلم: "ركعتا الفجر خير من الدنيا وما فيها" (رواه مسلم).
+                    <br />
+                    الاضطجاع: يُسنُّ الاضطجاع بعد ركعتي الفجر على الشق الأيمن لمن صلاهما في بيته، وهذا مذهب الشافعية والحنابلة.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">English</h3>
+                  <p className="leading-relaxed">
+                    The primary and most emphasized voluntary prayer is the Sunnah of Fajr, also known as the Ratibah (confirmed sunnah) or the Raghībah of Fajr.
+                    <br />
+                    Type: Two Rak&apos;ahs (cycles of prayer).
+                    <br />
+                    Ruling: It is the most emphasized of all the confirmed sunnah prayers (Al-Sunan al-Rawātib). The Prophet (PBUH) never left them, whether traveling or resident.
+                    <br />
+                    Time: They are performed after the true dawn appears (i.e., after the Fajr Adhan) and before the obligatory Fajr prayer is established (Iqamah).
+                    <br />
+                    Virtue: The Prophet (PBUH) said: &quot;The two Rak&apos;ahs before the Fajr prayer are better than the world and all that it contains.&quot; (Narrated by Muslim).
+                    <br />
+                    Recommended Action: It is a Sunnah to make them short and light, and to recite Surah Al-Kafirun in the first Rak&apos;ah and Surah Al-Ikhlas in the second, or similar short surahs.
+                    <br />
+                    Optional Action: It is also a Sunnah to lie down (Idtiba&apos;) briefly on one&apos;s right side after performing these two Sunnah Rak&apos;ahs, provided they were prayed at home.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4 py-8">
         {/* Page Title */}
         <div className="text-center mb-8">
@@ -368,7 +431,7 @@ export default function PrayerTimesPage() {
                       : prayer.isNext
                         ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
                         : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-                  }`}
+                  } ${prayer.name.toLowerCase() === 'fajr' ? 'cursor-pointer' : ''}`}
                   style={
                     prayer.name.toLowerCase() === 'fajr'
                       ? { backgroundImage: `url(${PIC_Fajr.src})` }
@@ -384,6 +447,10 @@ export default function PrayerTimesPage() {
                                 ? { backgroundImage: `url(${PIC_Isha.src})` }
                                 : undefined
                   }
+                  onClick={prayer.name.toLowerCase() === 'fajr' ? () => setShowFajrInfo(true) : undefined}
+                  onKeyDown={prayer.name.toLowerCase() === 'fajr' ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowFajrInfo(true); } : undefined}
+                  role={prayer.name.toLowerCase() === 'fajr' ? 'button' : undefined}
+                  tabIndex={prayer.name.toLowerCase() === 'fajr' ? 0 : -1}
                >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-full ${
