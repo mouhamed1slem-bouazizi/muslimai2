@@ -272,21 +272,23 @@ export default function PrayerTimesPage() {
           role="dialog"
           aria-modal="true"
           aria-label={language === 'ar' ? 'معلومات سنة الفجر' : 'Fajr Sunnah Information'}
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowFajrInfo(false); }}
         >
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center z-0 pointer-events-none"
             style={{ backgroundImage: `url(${PIC_Fajr.src})` }}
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-black/40 dark:bg-black/50" aria-hidden="true" />
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/50 z-10 pointer-events-none" aria-hidden="true" />
           <button
-            onClick={() => setShowFajrInfo(false)}
-            className="absolute top-4 right-4 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition"
+            onClick={(e) => { e.stopPropagation(); setShowFajrInfo(false); }}
+            className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
             <X className="w-5 h-5" />
           </button>
-          <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4 font-amiri">
                 {language === 'ar' ? 'سنة الفجر' : 'Sunnah of Fajr'}
