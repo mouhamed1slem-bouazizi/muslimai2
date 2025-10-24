@@ -35,6 +35,7 @@ import PIC_Dhuhr from '@/pic/PIC_Dhuhr.png';
 import PIC_Asr from '@/pic/PIC_Asr.png';
 import PIC_Maghreb from '@/pic/PIC_Maghreb.png';
 import PIC_Isha from '@/pic/PIC_Isha.png';
+import { getFajrOverlayContent, type FajrOverlayContent } from '@/lib/fajr-overlay-service';
 
 interface PrayerTime {
   name: string;
@@ -73,6 +74,8 @@ export default function PrayerTimesPage() {
   });
 
   const [showFajrInfo, setShowFajrInfo] = useState(false);
+  const [fajrContent, setFajrContent] = useState<FajrOverlayContent | null>(null);
+  const [fajrContentLoading, setFajrContentLoading] = useState<boolean>(true);
 
   // Update current time every second
   useEffect(() => {
@@ -91,6 +94,20 @@ export default function PrayerTimesPage() {
     fetchPrayerTimes();
     fetchCurrentDates();
   }, [userProfile]);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const content = await getFajrOverlayContent();
+        if (active) setFajrContent(content);
+      } catch (error) {
+        logger.warn('Error loading Fajr overlay content:', error as Error);
+      } finally {
+        if (active) setFajrContentLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   // Fetch current dates
   const fetchCurrentDates = async () => {
@@ -293,40 +310,20 @@ export default function PrayerTimesPage() {
               <h2 className="text-2xl md:text-3xl font-bold mb-4 font-amiri">
                 {language === 'ar' ? 'سنة الفجر' : 'Sunnah of Fajr'}
               </h2>
-              {language === 'ar' ? (
-                <div dir="rtl">
-                  <p className="leading-relaxed">
-                    النافلة الوحيدة المؤكدة قبل صلاة الفجر هي ركعتا سنة الفجر، وتُسمى أيضًا الراتبة القبلية لصلاة الفجر أو رغيبة الفجر.
-                    <br />
-                    الحكم: هي آكد السنن الرواتب وأفضلها، وسنة مؤكدة باتفاق الجمهور.
-                    <br />
-                    الوقت: تُصلى بعد دخول وقت الفجر الصادق (الأذان الثاني) وقبل إقامة صلاة الفجر.
-                    <br />
-                    العدد: ركعتان خفيفتان.
-                    <br />
-                    الفضل: قال عنها النبي صلى الله عليه وسلم: "ركعتا الفجر خير من الدنيا وما فيها" (رواه مسلم).
-                    <br />
-                    الاضطجاع: يُسنُّ الاضطجاع بعد ركعتي الفجر على الشق الأيمن لمن صلاهما في بيته، وهذا مذهب الشافعية والحنابلة.
-                  </p>
+              {fajrContentLoading ? (
+                <div className="flex items-center justify-center">
+                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
                 </div>
               ) : (
-                <div dir="ltr">
-                  <p className="leading-relaxed">
-                    The primary and most emphasized voluntary prayer is the Sunnah of Fajr, also known as the Ratibah (confirmed sunnah) or the Raghībah of Fajr.
-                    <br />
-                    Type: Two Rak&apos;ahs (cycles of prayer).
-                    <br />
-                    Ruling: It is the most emphasized of all the confirmed sunnah prayers (Al-Sunan al-Rawātib). The Prophet (PBUH) never left them, whether traveling or resident.
-                    <br />
-                    Time: They are performed after the true dawn appears (i.e., after the Fajr Adhan) and before the obligatory Fajr prayer is established (Iqamah).
-                    <br />
-                    Virtue: The Prophet (PBUH) said: &quot;The two Rak&apos;ahs before the Fajr prayer are better than the world and all that it contains.&quot; (Narrated by Muslim).
-                    <br />
-                    Recommended Action: It is a Sunnah to make them short and light, and to recite Surah Al-Kafirun in the first Rak&apos;ah and Surah Al-Ikhlas in the second, or similar short surahs.
-                    <br />
-                    Optional Action: It is also a Sunnah to lie down (Idtiba&apos;) briefly on one&apos;s right side after performing these two Sunnah Rak&apos;ahs, provided they were prayed at home.
-                  </p>
-                </div>
+                language === 'ar' ? (
+                  <div dir="rtl">
+                    <p className="leading-relaxed whitespace-pre-line">{fajrContent?.ar}</p>
+                  </div>
+                ) : (
+                  <div dir="ltr">
+                    <p className="leading-relaxed whitespace-pre-line">{fajrContent?.en}</p>
+                  </div>
+                )
               )}
             </div>
           </div>

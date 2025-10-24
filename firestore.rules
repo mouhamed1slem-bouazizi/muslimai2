@@ -21,6 +21,12 @@ service cloud.firestore {
     
     // Additional security rules for other collections if needed
     // You can add more rules here for other collections in your app
+
+    // Public read-only app content (e.g., overlay text)
+    match /app_content/{docId} {
+      allow read: if true;
+      allow write: if false; // restrict writes to admins via console or future rules
+    }
     
     // Deny all other access by default
     match /{document=**} {
