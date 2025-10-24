@@ -329,7 +329,7 @@ export async function getNextHijriHoliday(): Promise<NextHijriHoliday> {
 // Get Hijri calendar for a Gregorian month
 export async function getHijriCalendarForGregorianMonth(month: number, year: number): Promise<CalendarDay[]> {
   try {
-    const response = await fetch(`${BASE_URL}/gToHCalendar/${month}/${year}`);
+    const response = await fetch(`/api/aladhan/calendar?type=gToH&month=${month}&year=${year}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -344,7 +344,7 @@ export async function getHijriCalendarForGregorianMonth(month: number, year: num
 // Get Gregorian calendar for a Hijri month
 export async function getGregorianCalendarForHijriMonth(month: number, year: number): Promise<CalendarDay[]> {
   try {
-    const response = await fetch(`${BASE_URL}/hToGCalendar/${month}/${year}`);
+    const response = await fetch(`/api/aladhan/calendar?type=hToG&month=${month}&year=${year}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

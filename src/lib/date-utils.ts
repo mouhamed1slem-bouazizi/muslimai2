@@ -136,7 +136,7 @@ export const convertGregorianToHijri = async (date?: Date | string): Promise<Hij
       dateString = `${day}-${month}-${year}`;
     }
 
-    const response = await fetch(`https://api.aladhan.com/v1/gToH/${dateString}`);
+    const response = await fetch(`/api/aladhan/convert?type=gToH&date=${dateString}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -170,7 +170,7 @@ export const convertGregorianToHijri = async (date?: Date | string): Promise<Hij
 export const convertHijriToGregorian = async (day: number, month: number, year: number): Promise<GregorianDate> => {
   try {
     const dateString = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
-    const response = await fetch(`https://api.aladhan.com/v1/hToG/${dateString}`);
+    const response = await fetch(`/api/aladhan/convert?type=hToG&date=${dateString}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -209,7 +209,7 @@ export const getCurrentDates = async (): Promise<{
     const year = now.getFullYear();
     const dateString = `${day}-${month}-${year}`;
 
-    const response = await fetch(`https://api.aladhan.com/v1/gToH/${dateString}`);
+    const response = await fetch(`/api/aladhan/convert?type=gToH&date=${dateString}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
