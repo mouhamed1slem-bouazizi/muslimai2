@@ -195,23 +195,25 @@ export default function IslamicCalendar() {
   };
 
   const isSpecialDay = (day: CalendarDay) => {
-    if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return false;
-    const hijriDay = parseInt(day.date.hijri.day);
-    const hijriMonth = day.date.hijri.month.number;
-    
-    return state.specialDays.some(special => 
-      special.day === hijriDay && special.month === hijriMonth
-    );
+    try {
+      if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return false;
+      const hijriDay = parseInt(day.date.hijri.day);
+      const hijriMonth = day.date.hijri.month.number;
+      return state.specialDays.some(special => special.day === hijriDay && special.month === hijriMonth);
+    } catch (e) {
+      return false;
+    }
   };
 
   const getSpecialDayInfo = (day: CalendarDay) => {
-    if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return null;
-    const hijriDay = parseInt(day.date.hijri.day);
-    const hijriMonth = day.date.hijri.month.number;
-    
-    return state.specialDays.find(special => 
-      special.day === hijriDay && special.month === hijriMonth
-    );
+    try {
+      if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return null;
+      const hijriDay = parseInt(day.date.hijri.day);
+      const hijriMonth = day.date.hijri.month.number;
+      return state.specialDays.find(special => special.day === hijriDay && special.month === hijriMonth) || null;
+    } catch (e) {
+      return null;
+    }
   };
 
   if (state.loading && state.islamicMonths.length === 0) {
@@ -315,12 +317,16 @@ export default function IslamicCalendar() {
                 <div className="text-lg font-bold text-purple-600 font-amiri mb-1">
                   {language === 'ar' ? state.nextHoliday.name.ar : state.nextHoliday.name.en}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {state.nextHoliday.date.gregorian.date}
-                </div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  {state.nextHoliday.date.hijri.date}
-                </div>
+                {state.nextHoliday?.date?.gregorian?.date && (
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {state.nextHoliday.date.gregorian.date}
+                  </div>
+                )}
+                {state.nextHoliday?.date?.hijri?.date && (
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {state.nextHoliday.date.hijri.date}
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -402,14 +408,16 @@ export default function IslamicCalendar() {
 
               {/* Calendar Days */}
               <div className="grid grid-cols-7 gap-2">
-                {state.calendarData.map((day, index) => {
-                  const isSpecial = isSpecialDay(day);
-                  const specialInfo = getSpecialDayInfo(day);
-                  const isToday = day?.date?.gregorian?.date 
-                    ? new Date().toDateString() === new Date(day.date.gregorian.date).toDateString()
-                    : false;
+                {state.calendarData.filter(day => !!day?.date).map((day, index) => {
+                   try {
+                     const hasHijri = !!day?.date?.hijri?.day && !!day?.date?.hijri?.month?.number;
+                     const isSpecial = hasHijri ? isSpecialDay(day) : false;
+                     const specialInfo = hasHijri ? getSpecialDayInfo(day) : null;
+                     const isToday = day?.date?.gregorian?.date 
+                       ? new Date().toDateString() === new Date(day.date.gregorian.date).toDateString()
+                       : false;
 
-                  return (
+                     return (
                     <div
                       key={index}
                       className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
@@ -430,15 +438,15 @@ export default function IslamicCalendar() {
                               : 'text-gray-900 dark:text-white'
                         }`}>
                           {state.calendarType === 'gregorian' 
-                            ? day.date.gregorian?.day || ''
-                            : day.date.hijri?.day || ''}
+                            ? (day?.date?.gregorian?.day ?? '')
+                            : (day?.date?.hijri?.day ?? '')}
                         </div>
 
                         {/* Secondary Date */}
                         <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                           {state.calendarType === 'gregorian' 
-                            ? day.date.hijri?.day || '' 
-                            : day.date.gregorian?.day || ''}
+                            ? (day?.date?.hijri?.day ?? '') 
+                            : (day?.date?.gregorian?.day ?? '')}
                         </div>
 
                         {/* Special Day Indicator */}
@@ -457,7 +465,20 @@ export default function IslamicCalendar() {
                       </div>
                     </div>
                   );
-                })}
+                } catch (e) {
+                  return (
+                    <div
+                      key={index}
+                      className="p-3 rounded-lg border bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600"
+                    >
+                      <div className="text-center">
+                        <div className="text-lg font-bold mb-1 text-gray-400">{''}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{''}</div>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
               </div>
             </>
           )}
