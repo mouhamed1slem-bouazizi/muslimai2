@@ -168,7 +168,7 @@ export default function IslamicCalendar() {
       const isValid = isCalendarDataValid(calendarData, state.calendarType);
       if (!Array.isArray(calendarData) || calendarData.length === 0 || !isValid) {
         const generated = state.calendarType === 'gregorian'
-           ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths)
+           ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths, state.specialDays)
            : await generateHijriMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths);
         calendarData = generated;
       }
@@ -183,7 +183,7 @@ export default function IslamicCalendar() {
       // Attempt local fallback on error
       try {
         const generated = state.calendarType === 'gregorian'
-          ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths)
+          ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths, state.specialDays)
           : await generateHijriMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths);
         setState(prev => ({ ...prev, calendarData: generated, loading: false }));
       } catch (innerError) {
@@ -679,69 +679,154 @@ export default function IslamicCalendar() {
 }
 
 // Generate local fallback for Gregorian calendar with Hijri dates
-const generateGregorianMonthFallback = async (month: number, year: number, months: IslamicMonth[]): Promise<CalendarDay[]> => {
-   const daysInMonth = new Date(year, month, 0).getDate();
-   const items = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-   const results: CalendarDay[] = await Promise.all(items.map(async (dayNum) => {
-     const d = new Date(year, month - 1, dayNum);
-     const weekdayEn = d.toLocaleDateString('en-US', { weekday: 'long' });
-     const monthEn = d.toLocaleDateString('en-US', { month: 'long' });
-     const dd = String(dayNum).padStart(2, '0');
-     const mm = String(month).padStart(2, '0');
-     const yyyy = String(year);
-
-     // Local Hijri conversion via Intl to avoid network calls
-     const parts = new Intl.DateTimeFormat('en-u-ca-islamic', {
-       day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
-     }).formatToParts(d);
-     const getPart = (t: string) => parts.find(p => p.type === t)?.value || '';
-     const hijriDay = getPart('day');
-     const hijriMonthNum = Number(getPart('month')) || 1;
-     const hijriYear = getPart('year') || '1446';
-     const hijriWeekdayEn = getPart('weekday') || weekdayEn;
-     const arWeekdayMap: Record<string, string> = {
-       Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس',
-       Friday: 'الجمعة', Saturday: 'السبت', Sunday: 'الأحد'
-     };
-     const hijriWeekdayAr = arWeekdayMap[hijriWeekdayEn] || 'الإثنين';
-     const hijriMonthMeta = months.find(m => m.number === hijriMonthNum) || { number: 1, en: 'Muharram', ar: 'محرم' };
-     const hijri = {
-       day: String(hijriDay || '1'),
-       month: { number: hijriMonthMeta.number, en: hijriMonthMeta.en, ar: hijriMonthMeta.ar },
-       year: String(hijriYear),
-       weekday: { en: hijriWeekdayEn, ar: hijriWeekdayAr },
-       designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
-     };
-
-     const entry = {
-       date: {
-         readable: d.toDateString(),
-         timestamp: String(Math.floor(d.getTime() / 1000)),
-         hijri: {
-           date: `${String(hijri.day).padStart(2, '0')}-${String(hijri.month.number).padStart(2, '0')}-${hijri.year}`,
-           format: 'DD-MM-YYYY',
-           day: String(hijri.day),
-           weekday: { en: hijri.weekday.en, ar: hijri.weekday.ar },
-           month: { number: hijri.month.number, en: hijri.month.en, ar: hijri.month.ar },
-           year: String(hijri.year),
-           designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
-           holidays: []
-         },
-         gregorian: {
-           date: `${dd}-${mm}-${yyyy}`,
-           format: 'DD-MM-YYYY',
-           day: String(dayNum),
-           weekday: { en: weekdayEn },
-           month: { number: month, en: monthEn },
-           year: yyyy,
-           designation: { abbreviated: 'CE', expanded: 'Common Era' }
-         }
-       }
-     } as any as CalendarDay;
-     return entry;
-   }));
-   return results;
- };
+-const generateGregorianMonthFallback = async (month: number, year: number, months: IslamicMonth[]): Promise<CalendarDay[]> => {
+-   const daysInMonth = new Date(year, month, 0).getDate();
+-   const items = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+-   const results: CalendarDay[] = await Promise.all(items.map(async (dayNum) => {
+-     const d = new Date(year, month - 1, dayNum);
+-     const weekdayEn = d.toLocaleDateString('en-US', { weekday: 'long' });
+-     const monthEn = d.toLocaleDateString('en-US', { month: 'long' });
+-     const dd = String(dayNum).padStart(2, '0');
+-     const mm = String(month).padStart(2, '0');
+-     const yyyy = String(year);
+-
+-     // Local Hijri conversion via Intl to avoid network calls
+-     const parts = new Intl.DateTimeFormat('en-u-ca-islamic', {
+-       day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
+-     }).formatToParts(d);
+-     const getPart = (t: string) => parts.find(p => p.type === t)?.value || '';
+-     const hijriDay = getPart('day');
+-     const hijriMonthNum = Number(getPart('month')) || 1;
+-     const hijriYear = getPart('year') || '1446';
+-     const hijriWeekdayEn = getPart('weekday') || weekdayEn;
+-     const arWeekdayMap: Record<string, string> = {
+-       Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس',
+-       Friday: 'الجمعة', Saturday: 'السبت', Sunday: 'الأحد'
+-     };
+-     const hijriWeekdayAr = arWeekdayMap[hijriWeekdayEn] || 'الإثنين';
+-     const hijriMonthMeta = months.find(m => m.number === hijriMonthNum) || { number: 1, en: 'Muharram', ar: 'محرم' };
+-     const hijri = {
+-       day: String(hijriDay || '1'),
+-       month: { number: hijriMonthMeta.number, en: hijriMonthMeta.en, ar: hijriMonthMeta.ar },
+-       year: String(hijriYear),
+-       weekday: { en: hijriWeekdayEn, ar: hijriWeekdayAr },
+-       designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
+-     };
+-
+-     const entry = {
+-       date: {
+-         readable: d.toDateString(),
+-         timestamp: String(Math.floor(d.getTime() / 1000)),
+-         hijri: {
+-           date: `${String(hijri.day).padStart(2, '0')}-${String(hijri.month.number).padStart(2, '0')}-${hijri.year}`,
+-           format: 'DD-MM-YYYY',
+-           day: String(hijri.day),
+-           weekday: { en: hijri.weekday.en, ar: hijri.weekday.ar },
+-           month: { number: hijri.month.number, en: hijri.month.en, ar: hijri.month.ar },
+-           year: String(hijri.year),
+-           designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
+-           holidays: []
+-         },
+-         gregorian: {
+-           date: `${dd}-${mm}-${yyyy}`,
+-           format: 'DD-MM-YYYY',
+-           day: String(dayNum),
+-           weekday: { en: weekdayEn },
+-           month: { number: month, en: monthEn },
+-           year: yyyy,
+-           designation: { abbreviated: 'CE', expanded: 'Common Era' }
+-         }
+-       }
+-     } as any as CalendarDay;
+-     return entry;
+-   }));
+-   return results;
+- };
++const generateGregorianMonthFallback = async (
++  month: number,
++  year: number,
++  months: IslamicMonth[],
++  specialDays: SpecialDay[] = []
++): Promise<CalendarDay[]> => {
++  const daysInMonth = new Date(year, month, 0).getDate();
++  const items = Array.from({ length: daysInMonth }, (_, i) => i + 1);
++  const results: CalendarDay[] = await Promise.all(items.map(async (dayNum) => {
++    const d = new Date(year, month - 1, dayNum);
++    const weekdayEn = d.toLocaleDateString('en-US', { weekday: 'long' });
++    const monthEn = d.toLocaleDateString('en-US', { month: 'long' });
++    const dd = String(dayNum).padStart(2, '0');
++    const mm = String(month).padStart(2, '0');
++    const yyyy = String(year);
++
++    // Prefer precise conversion via Aladhan API (Umm al-Qura)
++    let hijri = null as any;
++    try {
++      hijri = await convertGregorianToHijri(`${dd}-${mm}-${yyyy}`);
++    } catch {
++      // Fallback to ICU calendar: try Umm al-Qura first, then generic Islamic
++      let parts: Intl.DateTimeFormatPart[] = [];
++      try {
++        parts = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
++          day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
++        }).formatToParts(d);
++      } catch {
++        parts = new Intl.DateTimeFormat('en-u-ca-islamic', {
++          day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
++        }).formatToParts(d);
++      }
++      const getPart = (t: string) => parts.find(p => p.type === t)?.value || '';
++      const hijriDayStr = getPart('day') || '1';
++      const hijriMonthNum = Number(getPart('month')) || 1;
++      const hijriYearStr = getPart('year') || '1446';
++      const hijriWeekdayEn = weekdayEn;
++      const arWeekdayMap: Record<string, string> = {
++        Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس',
++        Friday: 'الجمعة', Saturday: 'السبت', Sunday: 'الأحد'
++      };
++      const hijriWeekdayAr = arWeekdayMap[hijriWeekdayEn] || 'الإثنين';
++      const hijriMonthMeta = months.find(m => m.number === hijriMonthNum) || { number: 1, en: 'Muharram', ar: 'محرم' };
++      hijri = {
++        day: String(hijriDayStr),
++        month: { number: hijriMonthMeta.number, en: hijriMonthMeta.en, ar: hijriMonthMeta.ar },
++        year: String(hijriYearStr),
++        weekday: { en: hijriWeekdayEn, ar: hijriWeekdayAr },
++        designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
++      };
++    }
++
++    const holidaysFromSpecial = specialDays
++      .filter(s => s.day === Number(hijri.day) && s.month === Number(hijri.month.number))
++      .map(s => s.name?.en || s.name?.ar || '');
++
++    const entry = {
++      date: {
++        readable: d.toDateString(),
++        timestamp: String(Math.floor(d.getTime() / 1000)),
++        hijri: {
++          date: `${String(hijri.day).padStart(2, '0')}-${String(hijri.month.number).padStart(2, '0')}-${hijri.year}`,
++          format: 'DD-MM-YYYY',
++          day: String(hijri.day),
++          weekday: { en: hijri.weekday.en, ar: hijri.weekday.ar },
++          month: { number: hijri.month.number, en: hijri.month.en, ar: hijri.month.ar },
++          year: String(hijri.year),
++          designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
++          holidays: holidaysFromSpecial
++        },
++        gregorian: {
++          date: `${dd}-${mm}-${yyyy}`,
++          format: 'DD-MM-YYYY',
++          day: String(dayNum),
++          weekday: { en: weekdayEn },
++          month: { number: month, en: monthEn },
++          year: yyyy,
++          designation: { abbreviated: 'CE', expanded: 'Common Era' }
++        }
++      }
++    } as any as CalendarDay;
++    return entry;
++  }));
++  return results;
++};
 
 // Generate local fallback for Hijri calendar with Gregorian dates
 const generateHijriMonthFallback = async (month: number, year: number, months: IslamicMonth[]): Promise<CalendarDay[]> => {

@@ -266,15 +266,21 @@ export async function getSpecialDays(): Promise<SpecialDay[]> {
     const data: SpecialDaysResponse = await response.json();
     return (data.data || [])
       .filter((d: any) => !!d)
-      .map((d: any) => ({
-        day: typeof d?.day === 'number' ? d.day : 0,
-        month: typeof d?.month === 'number' ? d.month : 0,
-        name: {
-          en: typeof d?.name?.en === 'string' ? d.name.en : (typeof d?.name?.ar === 'string' ? d.name.ar : ''),
-          ar: typeof d?.name?.ar === 'string' ? d.name.ar : (typeof d?.name?.en === 'string' ? d.name.en : ''),
-        },
-        type: typeof d?.type === 'string' ? d.type : '',
-      }));
+      .map((d: any) => {
+        // Handle both object and string forms of name
+        const nameObj = typeof d?.name === 'string'
+          ? { en: d.name, ar: d.name }
+          : {
+              en: typeof d?.name?.en === 'string' ? d.name.en : (typeof d?.name?.ar === 'string' ? d.name.ar : ''),
+              ar: typeof d?.name?.ar === 'string' ? d.name.ar : (typeof d?.name?.en === 'string' ? d.name.en : ''),
+            };
+        return {
+          day: typeof d?.day === 'number' ? d.day : 0,
+          month: typeof d?.month === 'number' ? d.month : 0,
+          name: nameObj,
+          type: typeof d?.type === 'string' ? d.type : '',
+        };
+      });
   } catch (error) {
     logger.warn('Error fetching special days:', error);
     return [];
