@@ -267,28 +267,32 @@ export default function PrayerTimesPage() {
       <Header />
       
       {showFajrInfo && (
-        <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4">
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-label={language === 'ar' ? 'معلومات سنة الفجر' : 'Fajr Sunnah Information'}
+        >
           <div
-            className="relative w-full max-w-3xl rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl bg-cover bg-center overflow-hidden"
+            className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${PIC_Fajr.src})` }}
-            role="dialog"
-            aria-modal="true"
-            aria-label={language === 'ar' ? 'معلومات سنة الفجر' : 'Fajr Sunnah Information'}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/50" aria-hidden="true" />
+          <button
+            onClick={() => setShowFajrInfo(false)}
+            className="absolute top-4 right-4 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition"
+            aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <button
-              onClick={() => setShowFajrInfo(false)}
-              className="absolute top-3 right-3 inline-flex items-center justify-center rounded-full p-2 bg-black/40 hover:bg-black/60 text-white transition"
-              aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="bg-black/40 dark:bg-black/50 p-6 md:p-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 font-amiri">
+            <X className="w-5 h-5" />
+          </button>
+          <div className="absolute inset-0 flex items-center justify-center p-6">
+            <div className="max-w-2xl text-white text-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 font-amiri">
                 {language === 'ar' ? 'سنة الفجر' : 'Sunnah of Fajr'}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">العربية</h3>
+              {language === 'ar' ? (
+                <div dir="rtl">
                   <p className="leading-relaxed">
                     النافلة الوحيدة المؤكدة قبل صلاة الفجر هي ركعتا سنة الفجر، وتُسمى أيضًا الراتبة القبلية لصلاة الفجر أو رغيبة الفجر.
                     <br />
@@ -303,8 +307,8 @@ export default function PrayerTimesPage() {
                     الاضطجاع: يُسنُّ الاضطجاع بعد ركعتي الفجر على الشق الأيمن لمن صلاهما في بيته، وهذا مذهب الشافعية والحنابلة.
                   </p>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">English</h3>
+              ) : (
+                <div dir="ltr">
                   <p className="leading-relaxed">
                     The primary and most emphasized voluntary prayer is the Sunnah of Fajr, also known as the Ratibah (confirmed sunnah) or the Raghībah of Fajr.
                     <br />
@@ -321,7 +325,7 @@ export default function PrayerTimesPage() {
                     Optional Action: It is also a Sunnah to lie down (Idtiba&apos;) briefly on one&apos;s right side after performing these two Sunnah Rak&apos;ahs, provided they were prayed at home.
                   </p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
