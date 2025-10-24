@@ -27,6 +27,7 @@ import {
   PrayerTimesData 
 } from '@/lib/aladhan-api';
 import { getCurrentDates, GregorianDate, HijriDate, formatDate, formatCountdownNumber, formatCurrentTime } from '@/lib/date-utils';
+import { logger } from '@/lib/logger';
 
 interface PrayerTime {
   name: string;
@@ -88,7 +89,7 @@ export default function PrayerTimesPage() {
       const dates = await getCurrentDates();
       setCurrentDates(dates);
     } catch (error) {
-      console.error('Error fetching current dates:', error);
+      logger.warn('Error fetching current dates:', error as Error);
     }
   };
 
@@ -115,7 +116,7 @@ export default function PrayerTimesPage() {
       setPrayerData(data);
       updatePrayerTimes(data);
     } catch (err) {
-      console.error('Error fetching prayer times:', err);
+      logger.warn('Error fetching prayer times:', err as Error);
       setError(language === 'ar' ? 'خطأ في جلب مواقيت الصلاة' : 'Error fetching prayer times');
     } finally {
       setLoading(false);

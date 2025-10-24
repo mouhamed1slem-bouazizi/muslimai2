@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import UserPreferences from '@/components/UserPreferences';
+import { logger } from '@/lib/logger';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -71,9 +72,9 @@ export default function ProfilePage() {
       });
       
       // Show success message or redirect
-      console.log('Profile updated successfully');
+      logger.info('Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.warn('Error updating profile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -97,19 +98,19 @@ export default function ProfilePage() {
               setValue('city', data.city || data.locality || '');
               setValue('country', data.countryName || '');
             } catch (error) {
-              console.error('Error getting location details:', error);
+              logger.warn('Error getting location details:', error);
             }
             
             setIsGettingLocation(false);
           },
           (error) => {
-            console.error('Error getting location:', error);
+            logger.warn('Error getting location:', error);
             setIsGettingLocation(false);
           }
         );
       }
     } catch (error) {
-      console.error('Geolocation error:', error);
+      logger.warn('Geolocation error:', error);
       setIsGettingLocation(false);
     }
   };
@@ -119,7 +120,8 @@ export default function ProfilePage() {
       await logout();
       router.push('/');
     } catch (error) {
-      console.error('Error logging out:', error);
+      // Centralized logger to avoid noisy console errors
+      import('@/lib/logger').then(({ logger }) => logger.warn('Error logging out:', error));
     }
   };
 
@@ -347,7 +349,7 @@ export default function ProfilePage() {
         <UserPreferences 
           onPreferencesUpdate={(preferences) => {
             // Preferences will be automatically updated through the AuthContext
-            console.log('Preferences updated:', preferences);
+            logger.info('Preferences updated:', preferences);
           }}
         />
 

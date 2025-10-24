@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 
 // Firebase configuration
 // Note: Replace these with your actual Firebase config values
@@ -20,6 +20,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 // Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app);
+// Use long polling in dev environments to avoid websocket/network abort noise
+export const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
 export default app;

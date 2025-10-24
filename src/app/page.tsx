@@ -26,6 +26,7 @@ import {
   getNextPrayer, 
   PrayerTimesData 
 } from '@/lib/aladhan-api';
+import { logger } from '@/lib/logger';
 
 interface PrayerTime {
   name: string;
@@ -101,7 +102,7 @@ export default function Home() {
             },
           ]);
         } catch (error) {
-          console.error('Error fetching prayer times:', error);
+          logger.warn('Error fetching prayer times:', error as Error);
           // Fallback to mock data
           setPrayerTimes([
             { name: language === 'ar' ? 'الفجر' : 'Fajr', time: '5:30 AM', isNext: false, isCurrent: false },
@@ -159,7 +160,7 @@ export default function Home() {
             },
           ]);
         } catch (error) {
-          console.error('Error fetching prayer times:', error);
+          logger.warn('Error fetching prayer times:', error as Error);
           // Fallback to mock data
           setPrayerTimes([
             { name: language === 'ar' ? 'الفجر' : 'Fajr', time: '5:30 AM', isNext: false, isCurrent: false },

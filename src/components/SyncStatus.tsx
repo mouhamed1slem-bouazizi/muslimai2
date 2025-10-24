@@ -17,7 +17,11 @@ export default function SyncStatus() {
     try {
       await forceSyncPendingUpdates();
     } catch (error) {
-      console.error('Force sync failed:', error);
+      // Replace noisy console error with centralized logger
+      // Using warn since this is a recoverable UI action
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const err = error as any;
+      import('@/lib/logger').then(({ logger }) => logger.warn('Force sync failed:', err));
     } finally {
       setIsSyncing(false);
     }

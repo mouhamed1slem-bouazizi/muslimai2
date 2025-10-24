@@ -1,5 +1,7 @@
 // Date conversion utilities using Aladhan API
 
+import { logger } from '@/lib/logger';
+
 export interface HijriDate {
   day: string;
   month: {
@@ -148,26 +150,14 @@ export const convertGregorianToHijri = async (date?: Date | string): Promise<Hij
     
     return data.data.hijri;
   } catch (error) {
-    console.error('Error converting Gregorian to Hijri:', error);
-    // Return fallback Hijri date
-    const now = new Date();
+    logger.warn('Error converting Gregorian to Hijri:', error);
     return {
       day: '1',
-      month: {
-        number: 1,
-        en: 'Muharram',
-        ar: 'محرم'
-      },
+      month: { number: 1, en: 'Muharram', ar: 'محرم' },
       year: '1446',
-      weekday: {
-        en: 'Monday',
-        ar: 'الإثنين'
-      },
-      designation: {
-        abbreviated: 'AH',
-        expanded: 'Anno Hegirae'
-      }
-    };
+      weekday: { en: 'Monday', ar: 'الإثنين' },
+      designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
+    } as any;
   }
 };
 
@@ -194,24 +184,14 @@ export const convertHijriToGregorian = async (day: number, month: number, year: 
     
     return data.data.gregorian;
   } catch (error) {
-    console.error('Error converting Hijri to Gregorian:', error);
-    // Return fallback Gregorian date
-    const now = new Date();
+    logger.warn('Error converting Hijri to Gregorian:', error);
     return {
-      day: String(now.getDate()),
-      month: {
-        number: now.getMonth() + 1,
-        en: now.toLocaleDateString('en-US', { month: 'long' })
-      },
-      year: String(now.getFullYear()),
-      weekday: {
-        en: now.toLocaleDateString('en-US', { weekday: 'long' })
-      },
-      designation: {
-        abbreviated: 'CE',
-        expanded: 'Common Era'
-      }
-    };
+      day: '1',
+      month: { number: 1, en: 'January' },
+      year: '2025',
+      weekday: { en: 'Monday' },
+      designation: { abbreviated: 'CE', expanded: 'Common Era' }
+    } as any;
   }
 };
 
@@ -246,43 +226,8 @@ export const getCurrentDates = async (): Promise<{
       hijri: data.data.hijri
     };
   } catch (error) {
-    console.error('Error getting current dates:', error);
-    // Return fallback dates
-    const now = new Date();
-    return {
-      gregorian: {
-        day: String(now.getDate()),
-        month: {
-          number: now.getMonth() + 1,
-          en: now.toLocaleDateString('en-US', { month: 'long' })
-        },
-        year: String(now.getFullYear()),
-        weekday: {
-          en: now.toLocaleDateString('en-US', { weekday: 'long' })
-        },
-        designation: {
-          abbreviated: 'CE',
-          expanded: 'Common Era'
-        }
-      },
-      hijri: {
-        day: '1',
-        month: {
-          number: 1,
-          en: 'Muharram',
-          ar: 'محرم'
-        },
-        year: '1446',
-        weekday: {
-          en: 'Monday',
-          ar: 'الإثنين'
-        },
-        designation: {
-          abbreviated: 'AH',
-          expanded: 'Anno Hegirae'
-        }
-      }
-    };
+    logger.warn('Error getting current dates:', error);
+    return { hijri: null, gregorian: null } as any;
   }
 };
 

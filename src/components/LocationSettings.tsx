@@ -6,6 +6,7 @@ import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCurrentPosition, reverseGeocode, getCompleteLocation } from '@/lib/location';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 interface LocationSettingsProps {
   onLocationUpdate?: (location: { latitude: number; longitude: number; city: string; country: string }) => void;
@@ -57,7 +58,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
           : 'Location detected successfully'
       );
     } catch (error) {
-      console.error('GPS detection failed:', error);
+      logger.warn('GPS detection failed:', error as Error);
       toast.error(
         language === 'ar' 
           ? 'فشل في تحديد الموقع. تأكد من تفعيل خدمات الموقع' 
@@ -87,7 +88,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
 
       // Success message is handled in AuthContext
     } catch (error) {
-      console.error('Failed to save manual location:', error);
+      logger.warn('Failed to save manual location:', error as Error);
       // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);
@@ -113,7 +114,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
 
       // Success message is handled in AuthContext
     } catch (error) {
-      console.error('Failed to save GPS location:', error);
+      logger.warn('Failed to save GPS location:', error as Error);
       // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);

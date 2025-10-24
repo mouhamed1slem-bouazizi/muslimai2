@@ -33,6 +33,7 @@ import {
   CalendarDay
 } from '@/lib/aladhan-islamic-calendar-api';
 import { convertGregorianToHijri, convertHijriToGregorian } from '@/lib/date-utils';
+import { logger } from '@/lib/logger';
 
 interface CalendarState {
   currentIslamicYear: number;
@@ -118,7 +119,7 @@ export default function IslamicCalendar() {
         ramadanTargetGregorianDate = `${String(gDay).padStart(2, '0')}-${String(gMonthIdx + 1).padStart(2, '0')}-${String(gYear)}`;
         ramadanTargetHijriDate = `01-09-${String(targetHijriYear)}`;
       } catch (e) {
-        console.warn('Failed to compute Ramadan countdown:', e);
+        logger.warn('Failed to compute Ramadan countdown:', e as Error);
         ramadanDaysRemaining = null;
         ramadanTargetGregorianDate = null;
         ramadanTargetHijriDate = null;
@@ -138,7 +139,7 @@ export default function IslamicCalendar() {
         loading: false
       }));
     } catch (error) {
-      console.error('Error loading initial data:', error);
+      logger.warn('Error loading initial data:', error as Error);
       setState(prev => ({
         ...prev,
         error: 'Failed to load Islamic calendar data',
@@ -173,7 +174,7 @@ export default function IslamicCalendar() {
         loading: false
       }));
     } catch (error) {
-      console.error('Error loading calendar data:', error);
+      logger.warn('Error loading calendar data:', error as Error);
       // Attempt local fallback on error
       try {
         const generated = state.calendarType === 'gregorian'
@@ -181,7 +182,7 @@ export default function IslamicCalendar() {
           : await generateHijriMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths);
         setState(prev => ({ ...prev, calendarData: generated, loading: false }));
       } catch (innerError) {
-        console.error('Error generating local calendar fallback:', innerError);
+        logger.warn('Error generating local calendar fallback:', innerError as Error);
         setState(prev => ({ ...prev, error: 'Failed to load calendar data', loading: false }));
       }
     }

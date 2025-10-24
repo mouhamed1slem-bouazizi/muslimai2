@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 export interface AladhanPrayerTimes {
   Fajr: string;
   Sunrise: string;
@@ -211,7 +213,7 @@ export const fetchPrayerTimesByCity = async (
       },
     };
   } catch (error) {
-    console.error('Error fetching prayer times:', error);
+    logger.warn('Error fetching prayer times:', error);
     throw error;
   }
 };
@@ -288,7 +290,7 @@ export const fetchPrayerTimesByCoordinates = async (
       },
     };
   } catch (error) {
-    console.error('Error fetching prayer times:', error);
+    logger.warn('Error fetching prayer times:', error as Error);
     throw error;
   }
 };

@@ -3,6 +3,8 @@
  * Uses Pollinations API for text generation with Islamic content filtering
  */
 
+import { logger } from '@/lib/logger';
+
 export interface ChatMessage {
   id: string;
   content: string;
@@ -165,7 +167,7 @@ export async function generateAIResponse(prompt: string, language: string): Prom
     };
 
   } catch (error) {
-    console.error('Error generating AI response:', error);
+    logger.warn('Error generating AI response:', error);
     
     const errorMessage = language === 'ar'
       ? 'عذراً، حدث خطأ في الاتصال بالخدمة. يرجى المحاولة مرة أخرى لاحقاً.'

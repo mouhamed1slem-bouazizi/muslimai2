@@ -6,6 +6,7 @@ import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCalculationMethodName } from '@/lib/prayer-times';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 interface UserPreferencesProps {
   onPreferencesUpdate?: (preferences: any) => void;
@@ -68,7 +69,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
           : 'Preferences saved successfully'
       );
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      logger.warn('Failed to save preferences:', error as Error);
       // Error handling is now done in the AuthContext
     } finally {
       setIsUpdating(false);

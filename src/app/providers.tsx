@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 interface AppContextType {
   language: 'en' | 'ar';
@@ -46,7 +47,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           });
         },
         (error) => {
-          console.log('Location access denied:', error);
+          logger.warn('Location access denied:', error);
           // Default to Mecca coordinates
           setLocation({ latitude: 21.4225, longitude: 39.8262 });
         }

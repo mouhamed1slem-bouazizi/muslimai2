@@ -19,6 +19,7 @@ import {
   type PaginationOptions 
 } from '@/lib/chat-history-service';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 export default function AIChatPage() {
   const { language } = useApp();
@@ -69,7 +70,7 @@ export default function AIChatPage() {
       const sessionId = await chatHistoryService.createSession(user, language, welcomeMessage);
       setCurrentSessionId(sessionId);
     } catch (error) {
-      console.error('Failed to create session:', error);
+      logger.warn('Failed to create session:', error as Error);
     }
   };
 
@@ -93,7 +94,7 @@ export default function AIChatPage() {
       
       setChatSessions(result.sessions);
     } catch (error) {
-      console.error('Failed to load chat history:', error);
+      logger.warn('Failed to load chat history:', error as Error);
       toast.error(language === 'ar' ? 'فشل في تحميل السجل' : 'Failed to load history');
     } finally {
       setHistoryLoading(false);
@@ -106,7 +107,8 @@ export default function AIChatPage() {
     try {
       await chatHistoryService.addMessageToSession(currentSessionId, message, user.uid);
     } catch (error) {
-      console.error('Failed to save message:', error);
+      // Route to centralized logger to reduce console noise
+      import('@/lib/logger').then(({ logger }) => logger.warn('Failed to save message:', error as Error));
       // Don't show error to user for background saves
     }
   };
@@ -123,7 +125,7 @@ export default function AIChatPage() {
         toast.success(language === 'ar' ? 'تم تحميل المحادثة' : 'Conversation loaded');
       }
     } catch (error) {
-      console.error('Failed to load session:', error);
+      logger.warn('Failed to load session:', error as Error);
       toast.error(language === 'ar' ? 'فشل في تحميل المحادثة' : 'Failed to load conversation');
     }
   };
@@ -143,7 +145,7 @@ export default function AIChatPage() {
       
       toast.success(language === 'ar' ? 'تم حذف المحادثة' : 'Conversation deleted');
     } catch (error) {
-      console.error('Failed to delete session:', error);
+      logger.warn('Failed to delete session:', error as Error);
       toast.error(language === 'ar' ? 'فشل في حذف المحادثة' : 'Failed to delete conversation');
     }
   };
@@ -180,7 +182,7 @@ export default function AIChatPage() {
       // Save AI message to history
       await saveMessageToHistory(aiMessage);
     } catch (error) {
-      console.error('Error generating AI response:', error);
+      logger.warn('Error generating AI response:', error as Error);
       const errorMessage = createMessage(
         language === 'ar' 
           ? 'عذراً، حدث خطأ في الحصول على الرد. يرجى المحاولة مرة أخرى.'

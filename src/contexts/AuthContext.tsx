@@ -15,6 +15,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { syncService, SyncCallbacks } from '@/lib/sync-service';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 interface UserProfile {
   uid: string;
@@ -117,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     },
     onError: (error) => {
-      console.error('Sync error:', error);
+      logger.warn('Sync error:', error);
       toast.error('Sync error: ' + error.message);
     }
   };
@@ -187,7 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } as UserProfile);
       }
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      logger.warn('Error loading user profile:', error as Error);
     }
   };
 

@@ -21,6 +21,7 @@ import {
   Settings
 } from 'lucide-react';
 import SyncStatus from './SyncStatus';
+import { logger } from '@/lib/logger';
 
 const Header = () => {
   const { language, setLanguage, theme, setTheme } = useApp();
@@ -31,7 +32,7 @@ const Header = () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.warn('Logout error:', error as Error);
     }
   };
 

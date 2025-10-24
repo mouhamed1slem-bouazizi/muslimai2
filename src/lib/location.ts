@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 export interface LocationData {
   latitude: number;
   longitude: number;
@@ -87,7 +89,7 @@ export const reverseGeocode = async (
       country: data.countryName || 'Unknown Country',
     };
   } catch (error) {
-    console.error('Reverse geocoding error:', error);
+    logger.warn('Reverse geocoding error:', error);
     
     // Fallback: try alternative API
     try {
@@ -107,7 +109,7 @@ export const reverseGeocode = async (
         }
       }
     } catch (fallbackError) {
-      console.error('Fallback geocoding error:', fallbackError);
+      logger.warn('Fallback geocoding error:', fallbackError);
     }
     
     // Final fallback
@@ -208,7 +210,7 @@ export const getTimezone = async (
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return timezone;
   } catch (error) {
-    console.error('Timezone detection error:', error);
+    logger.warn('Timezone detection error:', error);
     return 'UTC';
   }
 };

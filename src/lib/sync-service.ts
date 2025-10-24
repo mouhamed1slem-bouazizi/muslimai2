@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { User } from 'firebase/auth';
+import { logger } from '@/lib/logger';
 
 export interface UserProfile {
   uid: string;
@@ -127,7 +128,7 @@ class SyncService {
         }
       },
       (error) => {
-        console.error('Real-time sync error:', error);
+        logger.warn('Real-time sync error:', error);
         this.callbacks.onError?.(error);
       }
     );
@@ -160,7 +161,7 @@ class SyncService {
         throw new Error('Offline - update will sync when online');
       }
     } catch (error) {
-      console.error('Profile update failed:', error);
+      logger.warn('Profile update failed:', error);
       // Store for retry
       this.pendingUpdates.set('profile', updateData);
       throw error;
@@ -250,7 +251,7 @@ class SyncService {
         });
         this.pendingUpdates.delete(key);
       } catch (error) {
-        console.error(`Failed to sync pending update for ${key}:`, error);
+        logger.warn(`Failed to sync pending update for ${key}:`, error);
       }
     }
   }

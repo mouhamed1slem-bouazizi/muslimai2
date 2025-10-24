@@ -1,6 +1,8 @@
 // Aladhan Islamic Calendar API Service
 // Comprehensive service for all Islamic calendar related APIs
 
+import { logger } from '@/lib/logger';
+
 export interface IslamicYearResponse {
   code: number;
   status: string;
@@ -199,7 +201,7 @@ export async function getCurrentIslamicYear(): Promise<number> {
     const data: IslamicYearResponse = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching current Islamic year:', error);
+    logger.warn('Error fetching current Islamic year:', error);
     return 1446;
   }
 }
@@ -214,7 +216,7 @@ export async function getCurrentIslamicMonth(): Promise<number> {
     const data: IslamicMonthResponse = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching current Islamic month:', error);
+    logger.warn('Error fetching current Islamic month:', error);
     return 1;
   }
 }
@@ -236,7 +238,7 @@ export async function getIslamicMonths(): Promise<IslamicMonth[]> {
         ar: typeof m.ar === 'string' ? m.ar : (typeof m.en === 'string' ? m.en : `الشهر ${typeof m.number === 'number' ? m.number : idx + 1}`),
       }));
   } catch (error) {
-    console.error('Error fetching Islamic months:', error);
+    logger.warn('Error fetching Islamic months:', error);
     return [
       { number: 1, en: 'Muharram', ar: 'محرم' },
       { number: 2, en: 'Safar', ar: 'صفر' },
@@ -274,7 +276,7 @@ export async function getSpecialDays(): Promise<SpecialDay[]> {
         type: typeof d?.type === 'string' ? d.type : '',
       }));
   } catch (error) {
-    console.error('Error fetching special days:', error);
+    logger.warn('Error fetching special days:', error);
     return [];
   }
 }
@@ -296,7 +298,7 @@ export async function getNextHijriHoliday(): Promise<NextHijriHoliday> {
     }
     return holiday as NextHijriHoliday;
   } catch (error) {
-    console.error('Error fetching next Hijri holiday:', error);
+    logger.warn('Error fetching next Hijri holiday:', error);
     return {
       name: { en: '', ar: '' },
       date: {
@@ -334,7 +336,7 @@ export async function getHijriCalendarForGregorianMonth(month: number, year: num
     const data: CalendarResponse = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching Hijri calendar for Gregorian month:', error);
+    logger.warn('Error fetching Hijri calendar for Gregorian month:', error);
     return [];
   }
 }
@@ -349,7 +351,7 @@ export async function getGregorianCalendarForHijriMonth(month: number, year: num
     const data: CalendarResponse = await response.json();
     return data.data;
   } catch (error) {
-    console.error('Error fetching Gregorian calendar for Hijri month:', error);
+    logger.warn('Error fetching Gregorian calendar for Hijri month:', error);
     return [];
   }
 }
@@ -374,7 +376,7 @@ export async function getCurrentIslamicDateInfo() {
       } : null
     };
   } catch (error) {
-    console.error('Error fetching current Islamic date info:', error);
+    logger.warn('Error fetching current Islamic date info:', error);
     const months = [
       { number: 1, en: 'Muharram', ar: 'محرم' },
       { number: 2, en: 'Safar', ar: 'صفر' },

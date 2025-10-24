@@ -22,6 +22,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { User } from 'firebase/auth';
+import { logger } from '@/lib/logger';
 
 // Types and Interfaces
 export interface ChatMessage {
@@ -113,7 +114,7 @@ class ChatHistoryService {
       this.invalidateCache(user.uid);
       return docRef.id;
     } catch (error) {
-      console.error('Error creating chat session:', error);
+      logger.warn('Error creating chat session:', error as Error);
       throw new Error('Failed to create chat session');
     }
   }
@@ -160,7 +161,7 @@ class ChatHistoryService {
 
       this.invalidateCache(userId);
     } catch (error) {
-      console.error('Error adding message to session:', error);
+      logger.warn('Error adding message to session:', error as Error);
       throw new Error('Failed to add message to session');
     }
   }
@@ -240,7 +241,7 @@ class ChatHistoryService {
         totalCount: sessions.length
       };
     } catch (error) {
-      console.error('Error getting chat sessions:', error);
+      logger.warn('Error getting chat sessions:', error as Error);
       throw new Error('Failed to load chat history');
     }
   }
@@ -264,7 +265,7 @@ class ChatHistoryService {
 
       return this.deserializeSession(sessionDoc);
     } catch (error) {
-      console.error('Error getting session:', error);
+      logger.warn('Error getting session:', error as Error);
       throw new Error('Failed to load session');
     }
   }
@@ -289,7 +290,7 @@ class ChatHistoryService {
       await deleteDoc(sessionRef);
       this.invalidateCache(userId);
     } catch (error) {
-      console.error('Error deleting session:', error);
+      logger.warn('Error deleting session:', error as Error);
       throw new Error('Failed to delete session');
     }
   }
@@ -302,7 +303,7 @@ class ChatHistoryService {
       const deletePromises = sessionIds.map(id => this.deleteSession(id, userId));
       await Promise.all(deletePromises);
     } catch (error) {
-      console.error('Error deleting sessions:', error);
+      logger.warn('Error deleting sessions:', error as Error);
       throw new Error('Failed to delete sessions');
     }
   }
@@ -327,7 +328,7 @@ class ChatHistoryService {
       await updateDoc(sessionRef, { title });
       this.invalidateCache(userId);
     } catch (error) {
-      console.error('Error updating session title:', error);
+      logger.warn('Error updating session title:', error as Error);
       throw new Error('Failed to update session title');
     }
   }
@@ -344,7 +345,7 @@ class ChatHistoryService {
       });
       this.invalidateCache(userId);
     } catch (error) {
-      console.error('Error ending session:', error);
+      logger.warn('Error ending session:', error as Error);
       throw new Error('Failed to end session');
     }
   }
@@ -380,7 +381,7 @@ class ChatHistoryService {
         totalCount: filteredSessions.length
       };
     } catch (error) {
-      console.error('Error searching sessions:', error);
+      logger.warn('Error searching sessions:', error as Error);
       throw new Error('Failed to search sessions');
     }
   }
@@ -404,10 +405,16 @@ class ChatHistoryService {
       q = query(q, where('language', '==', filter.language));
     }
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const sessions = snapshot.docs.map(doc => this.deserializeSession(doc));
-      callback(sessions);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const sessions = snapshot.docs.map(doc => this.deserializeSession(doc));
+        callback(sessions);
+      },
+      (error) => {
+        logger.warn('Chat sessions listener error:', error as Error);
+      }
+    );
 
     this.activeListeners.set(userId, unsubscribe);
     return unsubscribe;
