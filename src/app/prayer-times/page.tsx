@@ -28,6 +28,8 @@ import {
 } from '@/lib/aladhan-api';
 import { getCurrentDates, GregorianDate, HijriDate, formatDate, formatCountdownNumber, formatCurrentTime } from '@/lib/date-utils';
 import { logger } from '@/lib/logger';
+import PIC_Fajr from '@/pic/PIC_Fajr.png';
+import PIC_Sunrise from '@/pic/PIC_Sunrise.png';
 
 interface PrayerTime {
   name: string;
@@ -354,14 +356,23 @@ export default function PrayerTimesPage() {
             return (
               <div
                 key={index}
-                className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border shadow-lg transition-all duration-300 hover:shadow-xl ${
-                  prayer.isCurrent
-                    ? 'border-green-400 dark:border-green-500 ring-2 ring-green-200 dark:ring-green-800'
-                    : prayer.isNext
-                      ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-                }`}
-              >
+                className={`backdrop-blur-sm rounded-2xl p-6 border shadow-lg transition-all duration-300 hover:shadow-xl bg-cover bg-center ${
+                   prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' ? '' : 'bg-white/80 dark:bg-gray-800/80'
+                 } ${
+                   prayer.isCurrent
+                     ? 'border-green-400 dark:border-green-500 ring-2 ring-green-200 dark:ring-green-800'
+                     : prayer.isNext
+                       ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
+                       : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
+                 }`}
+                 style={
+                   prayer.name.toLowerCase() === 'fajr'
+                     ? { backgroundImage: `url(${PIC_Fajr.src})` }
+                     : prayer.name.toLowerCase() === 'sunrise'
+                       ? { backgroundImage: `url(${PIC_Sunrise.src})` }
+                       : undefined
+                 }
+               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-full ${
                     prayer.isCurrent
