@@ -195,7 +195,7 @@ export default function IslamicCalendar() {
   };
 
   const isSpecialDay = (day: CalendarDay) => {
-    if (!day?.date?.hijri) return false;
+    if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return false;
     const hijriDay = parseInt(day.date.hijri.day);
     const hijriMonth = day.date.hijri.month.number;
     
@@ -205,7 +205,7 @@ export default function IslamicCalendar() {
   };
 
   const getSpecialDayInfo = (day: CalendarDay) => {
-    if (!day?.date?.hijri) return null;
+    if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return null;
     const hijriDay = parseInt(day.date.hijri.day);
     const hijriMonth = day.date.hijri.month.number;
     
