@@ -194,26 +194,48 @@ export default function IslamicCalendar() {
     }
   };
 
-  const isSpecialDay = (day: CalendarDay) => {
+  const checkIsSpecialHijriDay = (day: CalendarDay) => {
     try {
-      if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return false;
-      const hijriDay = parseInt(day.date.hijri.day);
-      const hijriMonth = day.date.hijri.month.number;
-      return state.specialDays.some(special => special.day === hijriDay && special.month === hijriMonth);
+      const hijriDayStr = day?.date?.hijri?.day;
+      const hijriMonthNum = day?.date?.hijri?.month?.number;
+      if (!hijriDayStr || !hijriMonthNum) return false;
+      const hijriDay = parseInt(hijriDayStr);
+      const hijriMonth = hijriMonthNum;
+      return Array.isArray(state.specialDays) && state.specialDays.some(
+        (special) => typeof special.day === 'number' && typeof special.month === 'number' &&
+          special.day === hijriDay && special.month === hijriMonth
+      );
     } catch (e) {
       return false;
     }
   };
 
-  const getSpecialDayInfo = (day: CalendarDay) => {
+  // Back-compat alias to avoid stale chunk references
+  const isSpecialDay = (day: CalendarDay) => {
+    return checkIsSpecialHijriDay(day);
+  };
+
+  const getSpecialHijriDayInfo = (day: CalendarDay) => {
     try {
-      if (!day?.date?.hijri?.day || !day?.date?.hijri?.month?.number) return null;
-      const hijriDay = parseInt(day.date.hijri.day);
-      const hijriMonth = day.date.hijri.month.number;
-      return state.specialDays.find(special => special.day === hijriDay && special.month === hijriMonth) || null;
+      const hijriDayStr = day?.date?.hijri?.day;
+      const hijriMonthNum = day?.date?.hijri?.month?.number;
+      if (!hijriDayStr || !hijriMonthNum) return null;
+      const hijriDay = parseInt(hijriDayStr);
+      const hijriMonth = hijriMonthNum;
+      return (Array.isArray(state.specialDays)
+        ? state.specialDays.find(
+            (special) => typeof special.day === 'number' && typeof special.month === 'number' &&
+              special.day === hijriDay && special.month === hijriMonth
+          )
+        : null) || null;
     } catch (e) {
       return null;
     }
+  };
+
+  // Back-compat alias to avoid stale chunk references
+  const getSpecialDayInfo = (day: CalendarDay) => {
+    return getSpecialHijriDayInfo(day);
   };
 
   if (state.loading && state.islamicMonths.length === 0) {
@@ -315,7 +337,9 @@ export default function IslamicCalendar() {
             {state.nextHoliday && (
               <>
                 <div className="text-lg font-bold text-purple-600 font-amiri mb-1">
-                  {language === 'ar' ? state.nextHoliday.name.ar : state.nextHoliday.name.en}
+                  {language === 'ar' 
+                    ? (state.nextHoliday?.name?.ar ?? state.nextHoliday?.name?.en ?? '') 
+                    : (state.nextHoliday?.name?.en ?? state.nextHoliday?.name?.ar ?? '')}
                 </div>
                 {state.nextHoliday?.date?.gregorian?.date && (
                   <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -411,8 +435,8 @@ export default function IslamicCalendar() {
                 {state.calendarData.filter(day => !!day?.date).map((day, index) => {
                    try {
                      const hasHijri = !!day?.date?.hijri?.day && !!day?.date?.hijri?.month?.number;
-                     const isSpecial = hasHijri ? isSpecialDay(day) : false;
-                     const specialInfo = hasHijri ? getSpecialDayInfo(day) : null;
+                     const isSpecial = hasHijri ? checkIsSpecialHijriDay(day) : false;
+                     const specialInfo = hasHijri ? getSpecialHijriDayInfo(day) : null;
                      const isToday = day?.date?.gregorian?.date 
                        ? new Date().toDateString() === new Date(day.date.gregorian.date).toDateString()
                        : false;
@@ -504,7 +528,9 @@ export default function IslamicCalendar() {
                     </div>
                   </div>
                   <div className="font-amiri text-lg">
-                    {language === 'ar' ? day.name.ar : day.name.en}
+                    {language === 'ar' 
+                      ? (day.name?.ar ?? day.name?.en ?? '') 
+                      : (day.name?.en ?? day.name?.ar ?? '')}
                   </div>
                 </div>
               ))}
@@ -518,38 +544,38 @@ export default function IslamicCalendar() {
             {language === 'ar' ? 'الأشهر الهجرية' : 'Islamic Months'}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {state.islamicMonths.map((month) => (
-              <div
-                key={month.number}
-                className={`p-4 rounded-xl border text-center transition-all duration-200 hover:shadow-md ${
-                  month.number === state.currentIslamicMonth
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700'
-                    : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <div className={`text-2xl font-bold mb-2 ${
-                  month.number === state.currentIslamicMonth
-                    ? 'text-emerald-600'
-                    : 'text-gray-600 dark:text-gray-400'
-                }`}>
-                  {month.number}
-                </div>
-                <div className={`font-amiri text-lg ${
-                  month.number === state.currentIslamicMonth
-                    ? 'text-emerald-700 dark:text-emerald-300'
-                    : 'text-gray-900 dark:text-white'
-                }`}>
-                  {language === 'ar' ? month.ar : month.en}
-                </div>
-                {month.number === state.currentIslamicMonth && (
-                  <div className="text-xs mt-2 px-2 py-1 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200">
-                    {language === 'ar' ? 'الشهر الحالي' : 'Current Month'}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+            {state.islamicMonths.filter(Boolean).map((month) => (
+                       <div
+                         key={month.number}
+                         className={`p-4 rounded-xl border text-center transition-all duration-200 hover:shadow-md ${
+                           month.number === state.currentIslamicMonth
+                             ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700'
+                             : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                         }`}
+                       >
+                         <div className={`text-2xl font-bold mb-2 ${
+                           month.number === state.currentIslamicMonth
+                             ? 'text-emerald-600'
+                             : 'text-gray-600 dark:text-gray-400'
+                         }`}>
+                           {month.number}
+                         </div>
+                         <div className={`font-amiri text-lg ${
+                           month.number === state.currentIslamicMonth
+                             ? 'text-emerald-700 dark:text-emerald-300'
+                             : 'text-gray-900 dark:text-white'
+                         }`}>
+                          {language === 'ar' ? (month?.ar ?? month?.en ?? '') : (month?.en ?? month?.ar ?? '')}
+                         </div>
+                         {month.number === state.currentIslamicMonth && (
+                           <div className="text-xs mt-2 px-2 py-1 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200">
+                             {language === 'ar' ? 'الشهر الحالي' : 'Current Month'}
+                           </div>
+                         )}
+                       </div>
+                     ))}
+                   </div>
+                 </div>
       </main>
     </div>
   );

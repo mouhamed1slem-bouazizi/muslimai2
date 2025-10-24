@@ -200,7 +200,7 @@ export async function getCurrentIslamicYear(): Promise<number> {
     return data.data;
   } catch (error) {
     console.error('Error fetching current Islamic year:', error);
-    throw error;
+    return 1446;
   }
 }
 
@@ -215,7 +215,7 @@ export async function getCurrentIslamicMonth(): Promise<number> {
     return data.data;
   } catch (error) {
     console.error('Error fetching current Islamic month:', error);
-    throw error;
+    return 1;
   }
 }
 
@@ -227,11 +227,30 @@ export async function getIslamicMonths(): Promise<IslamicMonth[]> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: IslamicMonthsResponse = await response.json();
-    // Convert object to array
-    return Object.values(data.data);
+    // Convert object to array and sanitize entries
+    return Object.values(data.data)
+      .filter((m: any) => !!m && typeof m === 'object')
+      .map((m: any, idx: number) => ({
+        number: typeof m.number === 'number' ? m.number : idx + 1,
+        en: typeof m.en === 'string' ? m.en : (typeof m.ar === 'string' ? m.ar : `Month ${typeof m.number === 'number' ? m.number : idx + 1}`),
+        ar: typeof m.ar === 'string' ? m.ar : (typeof m.en === 'string' ? m.en : `الشهر ${typeof m.number === 'number' ? m.number : idx + 1}`),
+      }));
   } catch (error) {
     console.error('Error fetching Islamic months:', error);
-    throw error;
+    return [
+      { number: 1, en: 'Muharram', ar: 'محرم' },
+      { number: 2, en: 'Safar', ar: 'صفر' },
+      { number: 3, en: "Rabi' al-awwal", ar: 'ربيع الأول' },
+      { number: 4, en: "Rabi' al-thani", ar: 'ربيع الآخر' },
+      { number: 5, en: 'Jumada al-awwal', ar: 'جمادى الأولى' },
+      { number: 6, en: 'Jumada al-thani', ar: 'جمادى الآخرة' },
+      { number: 7, en: 'Rajab', ar: 'رجب' },
+      { number: 8, en: "Sha'ban", ar: 'شعبان' },
+      { number: 9, en: 'Ramadan', ar: 'رمضان' },
+      { number: 10, en: 'Shawwal', ar: 'شوال' },
+      { number: 11, en: 'Dhu al-Qadah', ar: 'ذو القعدة' },
+      { number: 12, en: 'Dhu al-Hijjah', ar: 'ذو الحجة' },
+    ];
   }
 }
 
@@ -243,10 +262,20 @@ export async function getSpecialDays(): Promise<SpecialDay[]> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: SpecialDaysResponse = await response.json();
-    return data.data;
+    return (data.data || [])
+      .filter((d: any) => !!d)
+      .map((d: any) => ({
+        day: typeof d?.day === 'number' ? d.day : 0,
+        month: typeof d?.month === 'number' ? d.month : 0,
+        name: {
+          en: typeof d?.name?.en === 'string' ? d.name.en : (typeof d?.name?.ar === 'string' ? d.name.ar : ''),
+          ar: typeof d?.name?.ar === 'string' ? d.name.ar : (typeof d?.name?.en === 'string' ? d.name.en : ''),
+        },
+        type: typeof d?.type === 'string' ? d.type : '',
+      }));
   } catch (error) {
     console.error('Error fetching special days:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -258,10 +287,40 @@ export async function getNextHijriHoliday(): Promise<NextHijriHoliday> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data: NextHijriHolidayResponse = await response.json();
-    return data.data;
+    const holiday: any = data.data;
+    if (holiday && holiday.name) {
+      holiday.name = {
+        en: typeof holiday.name.en === 'string' ? holiday.name.en : (typeof holiday.name.ar === 'string' ? holiday.name.ar : ''),
+        ar: typeof holiday.name.ar === 'string' ? holiday.name.ar : (typeof holiday.name.en === 'string' ? holiday.name.en : ''),
+      };
+    }
+    return holiday as NextHijriHoliday;
   } catch (error) {
     console.error('Error fetching next Hijri holiday:', error);
-    throw error;
+    return {
+      name: { en: '', ar: '' },
+      date: {
+        hijri: {
+          date: '',
+          format: 'DD-MM-YYYY',
+          day: '1',
+          weekday: { en: 'Monday', ar: 'الإثنين' },
+          month: { number: 1, en: 'Muharram', ar: 'محرم' },
+          year: '1446',
+          designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
+          holidays: []
+        },
+        gregorian: {
+          date: '',
+          format: 'DD-MM-YYYY',
+          day: '1',
+          weekday: { en: 'Monday' },
+          month: { number: 1, en: 'January' },
+          year: '2025',
+          designation: { abbreviated: 'CE', expanded: 'Common Era' }
+        }
+      }
+    } as NextHijriHoliday;
   }
 }
 
@@ -276,7 +335,7 @@ export async function getHijriCalendarForGregorianMonth(month: number, year: num
     return data.data;
   } catch (error) {
     console.error('Error fetching Hijri calendar for Gregorian month:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -291,7 +350,7 @@ export async function getGregorianCalendarForHijriMonth(month: number, year: num
     return data.data;
   } catch (error) {
     console.error('Error fetching Gregorian calendar for Hijri month:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -316,6 +375,24 @@ export async function getCurrentIslamicDateInfo() {
     };
   } catch (error) {
     console.error('Error fetching current Islamic date info:', error);
-    throw error;
+    const months = [
+      { number: 1, en: 'Muharram', ar: 'محرم' },
+      { number: 2, en: 'Safar', ar: 'صفر' },
+      { number: 3, en: "Rabi' al-awwal", ar: 'ربيع الأول' },
+      { number: 4, en: "Rabi' al-thani", ar: 'ربيع الآخر' },
+      { number: 5, en: 'Jumada al-awwal', ar: 'جمادى الأولى' },
+      { number: 6, en: 'Jumada al-thani', ar: 'جمادى الآخرة' },
+      { number: 7, en: 'Rajab', ar: 'رجب' },
+      { number: 8, en: "Sha'ban", ar: 'شعبان' },
+      { number: 9, en: 'Ramadan', ar: 'رمضان' },
+      { number: 10, en: 'Shawwal', ar: 'شوال' },
+      { number: 11, en: 'Dhu al-Qadah', ar: 'ذو القعدة' },
+      { number: 12, en: 'Dhu al-Hijjah', ar: 'ذو الحجة' },
+    ];
+    return {
+      year: 1446,
+      month: 1,
+      monthName: months[0]
+    };
   }
 }
