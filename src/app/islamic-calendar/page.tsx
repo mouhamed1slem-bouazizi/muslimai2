@@ -32,6 +32,7 @@ import {
   NextHijriHoliday,
   CalendarDay
 } from '@/lib/aladhan-islamic-calendar-api';
+import { convertGregorianToHijri, convertHijriToGregorian } from '@/lib/date-utils';
 
 interface CalendarState {
   currentIslamicYear: number;
@@ -46,6 +47,9 @@ interface CalendarState {
   calendarType: 'hijri' | 'gregorian';
   loading: boolean;
   error: string | null;
+  ramadanDaysRemaining?: number | null;
+  ramadanTargetGregorianDate?: string | null;
+  ramadanTargetHijriDate?: string | null;
 }
 
 export default function IslamicCalendar() {
@@ -97,6 +101,29 @@ export default function IslamicCalendar() {
         getNextHijriHoliday()
       ]);
 
+      // Calculate Ramadan countdown based on current Hijri year/month
+      let ramadanDaysRemaining: number | null = null;
+      let ramadanTargetGregorianDate: string | null = null;
+      let ramadanTargetHijriDate: string | null = null;
+      try {
+        const targetHijriYear = dateInfo.month >= 9 ? dateInfo.year + 1 : dateInfo.year;
+        const targetGregorian = await convertHijriToGregorian(1, 9, targetHijriYear);
+        const gDay = parseInt(targetGregorian.day, 10);
+        const gMonthIdx = Number(targetGregorian.month.number) - 1;
+        const gYear = parseInt(String(targetGregorian.year), 10);
+        const targetUTC = Date.UTC(gYear, gMonthIdx, gDay);
+        const now = new Date();
+        const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        ramadanDaysRemaining = Math.max(0, Math.ceil((targetUTC - todayUTC) / 86400000));
+        ramadanTargetGregorianDate = `${String(gDay).padStart(2, '0')}-${String(gMonthIdx + 1).padStart(2, '0')}-${String(gYear)}`;
+        ramadanTargetHijriDate = `01-09-${String(targetHijriYear)}`;
+      } catch (e) {
+        console.warn('Failed to compute Ramadan countdown:', e);
+        ramadanDaysRemaining = null;
+        ramadanTargetGregorianDate = null;
+        ramadanTargetHijriDate = null;
+      }
+
       setState(prev => ({
         ...prev,
         currentIslamicYear: dateInfo.year,
@@ -105,6 +132,9 @@ export default function IslamicCalendar() {
         islamicMonths: months,
         specialDays,
         nextHoliday,
+        ramadanDaysRemaining,
+        ramadanTargetGregorianDate,
+        ramadanTargetHijriDate,
         loading: false
       }));
     } catch (error) {
@@ -128,6 +158,15 @@ export default function IslamicCalendar() {
         calendarData = await getGregorianCalendarForHijriMonth(state.selectedMonth, state.selectedYear);
       }
 
+      // Validate shape; if invalid or empty, use local fallback
+      const isValid = isCalendarDataValid(calendarData, state.calendarType);
+      if (!Array.isArray(calendarData) || calendarData.length === 0 || !isValid) {
+        const generated = state.calendarType === 'gregorian'
+          ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear)
+          : await generateHijriMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths);
+        calendarData = generated;
+      }
+
       setState(prev => ({
         ...prev,
         calendarData,
@@ -135,11 +174,16 @@ export default function IslamicCalendar() {
       }));
     } catch (error) {
       console.error('Error loading calendar data:', error);
-      setState(prev => ({
-        ...prev,
-        error: 'Failed to load calendar data',
-        loading: false
-      }));
+      // Attempt local fallback on error
+      try {
+        const generated = state.calendarType === 'gregorian'
+          ? await generateGregorianMonthFallback(state.selectedMonth, state.selectedYear)
+          : await generateHijriMonthFallback(state.selectedMonth, state.selectedYear, state.islamicMonths);
+        setState(prev => ({ ...prev, calendarData: generated, loading: false }));
+      } catch (innerError) {
+        console.error('Error generating local calendar fallback:', innerError);
+        setState(prev => ({ ...prev, error: 'Failed to load calendar data', loading: false }));
+      }
     }
   };
 
@@ -326,32 +370,32 @@ export default function IslamicCalendar() {
             </div>
           </div>
 
-          {/* Next Holiday */}
+          {/* Ramadan Countdown (replaces Next Holiday) */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 text-center">
             <div className="flex items-center justify-center mb-4">
               <Gift className="w-8 h-8 text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 font-amiri">
-              {language === 'ar' ? 'المناسبة القادمة' : 'Next Holiday'}
+              {language === 'ar' ? 'العد التنازلي لرمضان' : 'Ramadan Countdown'}
             </h3>
-            {state.nextHoliday && (
-              <>
-                <div className="text-lg font-bold text-purple-600 font-amiri mb-1">
-                  {language === 'ar' 
-                    ? (state.nextHoliday?.name?.ar ?? state.nextHoliday?.name?.en ?? '') 
-                    : (state.nextHoliday?.name?.en ?? state.nextHoliday?.name?.ar ?? '')}
-                </div>
-                {state.nextHoliday?.date?.gregorian?.date && (
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {state.nextHoliday.date.gregorian.date}
-                  </div>
-                )}
-                {state.nextHoliday?.date?.hijri?.date && (
-                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    {state.nextHoliday.date.hijri.date}
-                  </div>
-                )}
-              </>
+            <div className="text-lg font-bold text-purple-600 font-amiri mb-1">
+              {typeof state.ramadanDaysRemaining === 'number' ? (
+                language === 'ar'
+                  ? `بداية رمضان بعد ${state.ramadanDaysRemaining} ${formatDaysAr(state.ramadanDaysRemaining)}`
+                  : `Ramadan begins in ${state.ramadanDaysRemaining} days`
+              ) : (
+                language === 'ar' ? 'غير متوفر مؤقتًا' : 'Temporarily unavailable'
+              )}
+            </div>
+            {state.ramadanTargetGregorianDate && (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {language === 'ar' ? 'التاريخ الميلادي:' : 'Gregorian:'} {state.ramadanTargetGregorianDate}
+              </div>
+            )}
+            {state.ramadanTargetHijriDate && (
+              <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                {language === 'ar' ? 'التاريخ الهجري:' : 'Hijri:'} {state.ramadanTargetHijriDate}
+              </div>
             )}
           </div>
         </div>
@@ -580,3 +624,132 @@ export default function IslamicCalendar() {
     </div>
   );
 }
+
+// Generate local fallback for Gregorian calendar with Hijri dates
+const generateGregorianMonthFallback = async (month: number, year: number): Promise<CalendarDay[]> => {
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const items = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const results: CalendarDay[] = await Promise.all(items.map(async (dayNum) => {
+    const d = new Date(year, month - 1, dayNum);
+    const weekdayEn = d.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthEn = d.toLocaleDateString('en-US', { month: 'long' });
+    const dd = String(dayNum).padStart(2, '0');
+    const mm = String(month).padStart(2, '0');
+    const yyyy = String(year);
+
+    let hijri;
+    try {
+      hijri = await convertGregorianToHijri(d);
+    } catch {
+      hijri = {
+        day: '1',
+        month: { number: 1, en: 'Muharram', ar: 'محرم' },
+        year: '1446',
+        weekday: { en: 'Monday', ar: 'الإثنين' },
+        designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
+      };
+    }
+
+    const entry = {
+      date: {
+        readable: d.toDateString(),
+        timestamp: String(Math.floor(d.getTime() / 1000)),
+        hijri: {
+          date: `${String(hijri.day).padStart(2, '0')}-${String(hijri.month.number).padStart(2, '0')}-${hijri.year}`,
+          format: 'DD-MM-YYYY',
+          day: String(hijri.day),
+          weekday: { en: hijri.weekday.en, ar: hijri.weekday.ar },
+          month: { number: hijri.month.number, en: hijri.month.en, ar: hijri.month.ar },
+          year: String(hijri.year),
+          designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
+          holidays: []
+        },
+        gregorian: {
+          date: `${dd}-${mm}-${yyyy}`,
+          format: 'DD-MM-YYYY',
+          day: String(dayNum),
+          weekday: { en: weekdayEn },
+          month: { number: month, en: monthEn },
+          year: yyyy,
+          designation: { abbreviated: 'CE', expanded: 'Common Era' }
+        }
+      }
+    } as any as CalendarDay;
+    return entry;
+  }));
+  return results;
+};
+
+// Generate local fallback for Hijri calendar with Gregorian dates
+const generateHijriMonthFallback = async (month: number, year: number, months: IslamicMonth[]): Promise<CalendarDay[]> => {
+  const hijriMonth = months.find(m => m.number === month);
+   const daysInHijriMonth = 30; // best-effort fallback
+   const items = Array.from({ length: daysInHijriMonth }, (_, i) => i + 1);
+   const results: CalendarDay[] = await Promise.all(items.map(async (dayNum) => {
+     let greg;
+     try {
+       greg = await convertHijriToGregorian(dayNum, month, year);
+     } catch {
+       const d = new Date();
+       greg = {
+         day: String(d.getDate()),
+         month: { number: d.getMonth() + 1, en: d.toLocaleDateString('en-US', { month: 'long' }) },
+         year: String(d.getFullYear()),
+         weekday: { en: d.toLocaleDateString('en-US', { weekday: 'long' }) },
+         designation: { abbreviated: 'CE', expanded: 'Common Era' }
+       };
+     }
+
+     const dd = String(dayNum).padStart(2, '0');
+     const mm = String(month).padStart(2, '0');
+     const yyyy = String(year);
+
+     const entry = {
+       date: {
+         readable: `${dd}-${mm}-${yyyy}`,
+         timestamp: String(Math.floor(Date.now() / 1000)),
+         hijri: {
+           date: `${dd}-${mm}-${yyyy}`,
+           format: 'DD-MM-YYYY',
+           day: String(dayNum),
+           weekday: { en: 'Monday', ar: 'الإثنين' },
+           month: { number: month, en: hijriMonth?.en || 'Muharram', ar: hijriMonth?.ar || 'محرم' },
+           year: yyyy,
+           designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' },
+           holidays: []
+         },
+         gregorian: {
+           date: `${String(greg.day).padStart(2, '0')}-${String(greg.month.number).padStart(2, '0')}-${greg.year}`,
+           format: 'DD-MM-YYYY',
+           day: String(greg.day),
+           weekday: { en: greg.weekday.en },
+           month: { number: greg.month.number, en: greg.month.en },
+           year: String(greg.year),
+           designation: { abbreviated: 'CE', expanded: 'Common Era' }
+         }
+       }
+     } as any as CalendarDay;
+     return entry;
+   }));
+   return results;
+ };
+
+// Validate calendar data shape
+const isCalendarDataValid = (data: CalendarDay[], type: 'gregorian' | 'hijri'): boolean => {
+  if (!Array.isArray(data) || data.length === 0) return false;
+  // Require most items to have both date objects
+  const validItems = data.filter((d) => {
+    const hasDate = !!d?.date;
+    const hasG = !!d?.date?.gregorian?.day && !!d?.date?.gregorian?.date;
+    const hasH = !!d?.date?.hijri?.day && !!d?.date?.hijri?.date;
+    return hasDate && hasG && hasH;
+  }).length;
+  return validItems >= Math.max(1, Math.floor(data.length * 0.6));
+};
+
+// Helper: Arabic pluralization for days
+const formatDaysAr = (n: number) => {
+  if (n === 1) return 'يوم';
+  if (n === 2) return 'يومان';
+  return 'أيام';
+};
