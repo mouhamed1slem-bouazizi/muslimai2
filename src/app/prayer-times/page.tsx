@@ -32,6 +32,7 @@ import PIC_Fajr from '@/pic/PIC_Fajr.png';
 import PIC_Sunrise from '@/pic/PIC_Sunrise.png';
 import PIC_Dhuhr from '@/pic/PIC_Dhuhr.png';
 import PIC_Asr from '@/pic/PIC_Asr.png';
+import PIC_Maghreb from '@/pic/PIC_Maghreb.png';
 
 interface PrayerTime {
   name: string;
@@ -359,7 +360,7 @@ export default function PrayerTimesPage() {
               <div
                 key={index}
                 className={`backdrop-blur-sm rounded-2xl p-6 border shadow-lg transition-all duration-300 hover:shadow-xl bg-cover bg-center ${
-                    prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' || prayer.name.toLowerCase() === 'asr' ? '' : 'bg-white/80 dark:bg-gray-800/80'
+                    prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' || prayer.name.toLowerCase() === 'asr' || prayer.name.toLowerCase() === 'maghrib' ? '' : 'bg-white/80 dark:bg-gray-800/80'
                   } ${
                     prayer.isCurrent
                       ? 'border-green-400 dark:border-green-500 ring-2 ring-green-200 dark:ring-green-800'
@@ -376,7 +377,9 @@ export default function PrayerTimesPage() {
                           ? { backgroundImage: `url(${PIC_Dhuhr.src})` }
                           : prayer.name.toLowerCase() === 'asr'
                             ? { backgroundImage: `url(${PIC_Asr.src})` }
-                            : undefined
+                            : prayer.name.toLowerCase() === 'maghrib'
+                              ? { backgroundImage: `url(${PIC_Maghreb.src})` }
+                              : undefined
                   }
                >
                 <div className="flex items-center justify-between mb-4">
