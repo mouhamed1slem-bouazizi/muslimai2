@@ -718,40 +718,56 @@ const generateGregorianMonthFallback = async (
     const mm = String(month).padStart(2, '0');
     const yyyy = String(year);
 
-    // Prefer precise conversion via Aladhan API (Umm al-Qura)
+    // Prefer local ICU conversion first to avoid API rate limits
     let hijri = null as any;
     try {
-      hijri = await convertGregorianToHijri(`${dd}-${mm}-${yyyy}`);
-    } catch {
-      // Fallback to ICU calendar: try Umm al-Qura first, then generic Islamic
-      let parts: Intl.DateTimeFormatPart[] = [];
+      const enNumeric = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+        day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
+      }).formatToParts(d);
+      const enLong = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+        day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
+      }).formatToParts(d);
+      let arLong: Intl.DateTimeFormatPart[] = [];
       try {
-        parts = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
-          day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
+        arLong = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+          day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
         }).formatToParts(d);
       } catch {
-        parts = new Intl.DateTimeFormat('en-u-ca-islamic', {
-          day: 'numeric', month: 'numeric', year: 'numeric', weekday: 'long'
+        arLong = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+          day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
         }).formatToParts(d);
       }
-      const getPart = (t: string) => parts.find(p => p.type === t)?.value || '';
-      const hijriDayStr = getPart('day') || '1';
-      const hijriMonthNum = Number(getPart('month')) || 1;
-      const hijriYearStr = getPart('year') || '1446';
-      const hijriWeekdayEn = weekdayEn;
-      const arWeekdayMap: Record<string, string> = {
-        Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس',
-        Friday: 'الجمعة', Saturday: 'السبت', Sunday: 'الأحد'
-      };
-      const hijriWeekdayAr = arWeekdayMap[hijriWeekdayEn] || 'الإثنين';
-      const hijriMonthMeta = months.find(m => m.number === hijriMonthNum) || { number: 1, en: 'Muharram', ar: 'محرم' };
+      const hijriDayStr = enNumeric.find(p => p.type === 'day')?.value || '1';
+      const hijriMonthNum = Number(enNumeric.find(p => p.type === 'month')?.value || 1);
+      const hijriYearStr = enNumeric.find(p => p.type === 'year')?.value || '1446';
+      const hijriWeekdayEn = enNumeric.find(p => p.type === 'weekday')?.value || weekdayEn;
+      const hijriWeekdayAr = (arLong.find(p => p.type === 'weekday')?.value || d.toLocaleDateString('ar-SA', { weekday: 'long' }));
+      const hijriMonthEn = (enLong.find(p => p.type === 'month')?.value || 'Muharram');
+      const hijriMonthAr = (arLong.find(p => p.type === 'month')?.value || 'محرم');
       hijri = {
         day: String(hijriDayStr),
-        month: { number: hijriMonthMeta.number, en: hijriMonthMeta.en, ar: hijriMonthMeta.ar },
+        month: { number: hijriMonthNum, en: String(hijriMonthEn), ar: String(hijriMonthAr) },
         year: String(hijriYearStr),
-        weekday: { en: hijriWeekdayEn, ar: hijriWeekdayAr },
+        weekday: { en: String(hijriWeekdayEn), ar: String(hijriWeekdayAr) },
         designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
       };
+    } catch {
+      // Last resort: call API for this date
+      try {
+        hijri = await convertGregorianToHijri(`${dd}-${mm}-${yyyy}`);
+      } catch {
+        const arWeekdayMap: Record<string, string> = {
+          Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس',
+          Friday: 'الجمعة', Saturday: 'السبت', Sunday: 'الأحد'
+        };
+        hijri = {
+          day: dd,
+          month: { number: 1, en: 'Muharram', ar: 'محرم' },
+          year: String(new Date().getFullYear()),
+          weekday: { en: weekdayEn, ar: arWeekdayMap[weekdayEn] || 'الإثنين' },
+          designation: { abbreviated: 'AH', expanded: 'Anno Hegirae' }
+        };
+      }
     }
 
     const holidaysFromSpecial = specialDays
