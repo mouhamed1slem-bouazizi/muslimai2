@@ -60,6 +60,8 @@ export default function QiblaPage() {
   const [deviceHeading, setDeviceHeading] = useState<number | null>(null);
   const [liveCompassEnabled, setLiveCompassEnabled] = useState<boolean>(false);
   const [compassPermissionError, setCompassPermissionError] = useState<string>('');
+  const [facingQibla, setFacingQibla] = useState<boolean>(false);
+  const [lastVibrateAt, setLastVibrateAt] = useState<number>(0);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
@@ -242,6 +244,26 @@ export default function QiblaPage() {
         : qiblaDeg)
     : 0;
 
+  const FACING_THRESHOLD_DEG = 5;
+  const VIBRATE_COOLDOWN_MS = 10000;
+
+  useEffect(() => {
+    if (!liveCompassEnabled || deviceHeading == null || qiblaDeg == null) {
+      setFacingQibla(false);
+      return;
+    }
+    const delta = Math.min(arrowRotation, 360 - arrowRotation);
+    const isFacing = delta <= FACING_THRESHOLD_DEG;
+    setFacingQibla(isFacing);
+    if (isFacing) {
+      const now = Date.now();
+      if ((navigator as any).vibrate && now - lastVibrateAt > VIBRATE_COOLDOWN_MS) {
+        try { (navigator as any).vibrate([20, 40, 20]); } catch (_) {}
+        setLastVibrateAt(now);
+      }
+    }
+  }, [arrowRotation, liveCompassEnabled, deviceHeading, qiblaDeg]);
+
   const titleText = language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction';
   const subtitleText = language === 'ar' ? 'اختر موقعك على الخريطة أو استخدم موقعك الحالي' : 'Pick a location on the map or use your current location';
 
@@ -317,25 +339,37 @@ export default function QiblaPage() {
                   : (language === 'ar' ? 'فعّل البوصلة الحية' : 'Enable Live Compass')}
               </button>
               {liveCompassEnabled && (
-                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                  {language === 'ar'
-                    ? `اتجاه جهازك: ${Math.round(deviceHeading ?? 0)}°`
-                    : `Device heading: ${Math.round(deviceHeading ?? 0)}°`}
-                </div>
-              )}
-              {compassPermissionError && (
-                <div className="mt-2 text-xs text-red-600 dark:text-red-400">{compassPermissionError}</div>
-              )}
+                 <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                   {language === 'ar'
+                     ? `اتجاه جهازك: ${Math.round(deviceHeading ?? 0)}°`
+                     : `Device heading: ${Math.round(deviceHeading ?? 0)}°`}
+                 </div>
+               )}
+               {liveCompassEnabled && (
+                 <div className={`mt-1 text-xs ${facingQibla ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                   {facingQibla ? (language === 'ar' ? 'تواجه القبلة' : 'Facing Qibla') : (language === 'ar' ? 'غير مواجه للقبلة' : 'Not facing Qibla')}
+                 </div>
+               )}
+               {compassPermissionError && (
+                 <div className="mt-2 text-xs text-red-600 dark:text-red-400">{compassPermissionError}</div>
+               )}
             </div>
 
             {/* Compass UI */}
             <div className="flex items-center justify-center">
-              <div className="relative w-56 h-56 rounded-full border-4 border-emerald-500 dark:border-emerald-400 flex items-center justify-center">
+              <div className={`relative w-56 h-56 rounded-full border-4 ${facingQibla ? 'border-emerald-600 dark:border-emerald-400 ring-2 ring-emerald-400/50' : 'border-emerald-500 dark:border-emerald-400'} flex items-center justify-center`}>
                 {/* Cardinal directions */}
                 <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs text-gray-700 dark:text-gray-300">N</div>
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-700 dark:text-gray-300">S</div>
                 <div className="absolute top-1/2 -translate-y-1/2 left-1 text-xs text-gray-700 dark:text-gray-300">W</div>
                 <div className="absolute top-1/2 -translate-y-1/2 right-1 text-xs text-gray-700 dark:text-gray-300">E</div>
+                {/* Qibla marker on rim */}
+                <div className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(${arrowRotation}deg)`, transformOrigin: 'center' }}>
+                  <div className="mt-1 flex flex-col items-center">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400">🕋 {language === 'ar' ? 'القبلة' : 'Qibla'}</div>
+                  </div>
+                </div>
                 {/* Arrow */}
                 <div className="absolute w-0 h-0 border-l-8 border-r-8 border-b-[64px] border-l-transparent border-r-transparent border-b-red-600" style={{ transform: `rotate(${arrowRotation}deg)` }} />
               </div>
