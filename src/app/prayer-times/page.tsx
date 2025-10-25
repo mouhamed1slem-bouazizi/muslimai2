@@ -36,6 +36,7 @@ import PIC_Asr from '@/pic/PIC_Asr.png';
 import PIC_Maghreb from '@/pic/PIC_Maghreb.png';
 import PIC_Isha from '@/pic/PIC_Isha.png';
 import { getFajrOverlayContent, type FajrOverlayContent } from '@/lib/fajr-overlay-service';
+import { getSunriseOverlayContent, type SunriseOverlayContent } from '@/lib/sunrise-overlay-service';
 
 interface PrayerTime {
   name: string;
@@ -76,6 +77,9 @@ export default function PrayerTimesPage() {
   const [showFajrInfo, setShowFajrInfo] = useState(false);
   const [fajrContent, setFajrContent] = useState<FajrOverlayContent | null>(null);
   const [fajrContentLoading, setFajrContentLoading] = useState<boolean>(true);
+  const [showSunriseInfo, setShowSunriseInfo] = useState(false);
+  const [sunriseContent, setSunriseContent] = useState<SunriseOverlayContent | null>(null);
+  const [sunriseContentLoading, setSunriseContentLoading] = useState<boolean>(true);
 
   // Update current time every second
   useEffect(() => {
@@ -104,6 +108,20 @@ export default function PrayerTimesPage() {
         logger.warn('Error loading Fajr overlay content:', error as Error);
       } finally {
         if (active) setFajrContentLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const content = await getSunriseOverlayContent();
+        if (active) setSunriseContent(content);
+      } catch (error) {
+        logger.warn('Error loading Sunrise overlay content:', error as Error);
+      } finally {
+        if (active) setSunriseContentLoading(false);
       }
     })();
     return () => { active = false; };
@@ -434,7 +452,7 @@ export default function PrayerTimesPage() {
                       : prayer.isNext
                         ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
                         : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-                  } ${prayer.name.toLowerCase() === 'fajr' ? 'cursor-pointer' : ''}`}
+                  } ${prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' ? 'cursor-pointer' : ''}`}
                   style={
                     prayer.name.toLowerCase() === 'fajr'
                       ? { backgroundImage: `url(${PIC_Fajr.src})` }
@@ -450,10 +468,22 @@ export default function PrayerTimesPage() {
                                 ? { backgroundImage: `url(${PIC_Isha.src})` }
                                 : undefined
                   }
-                  onClick={prayer.name.toLowerCase() === 'fajr' ? () => setShowFajrInfo(true) : undefined}
-                  onKeyDown={prayer.name.toLowerCase() === 'fajr' ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowFajrInfo(true); } : undefined}
-                  role={prayer.name.toLowerCase() === 'fajr' ? 'button' : undefined}
-                  tabIndex={prayer.name.toLowerCase() === 'fajr' ? 0 : -1}
+                  onClick={
+                    prayer.name.toLowerCase() === 'fajr' 
+                      ? () => setShowFajrInfo(true) 
+                      : prayer.name.toLowerCase() === 'sunrise' 
+                        ? () => setShowSunriseInfo(true) 
+                        : undefined
+                  }
+                  onKeyDown={
+                    prayer.name.toLowerCase() === 'fajr' 
+                      ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowFajrInfo(true); } 
+                      : prayer.name.toLowerCase() === 'sunrise' 
+                        ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowSunriseInfo(true); } 
+                        : undefined
+                  }
+                  role={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' ? 'button' : undefined}
+                  tabIndex={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' ? 0 : -1}
                >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-full ${
