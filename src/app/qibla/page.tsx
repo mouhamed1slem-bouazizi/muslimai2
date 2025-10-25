@@ -238,11 +238,10 @@ export default function QiblaPage() {
     };
   }, []);
 
-  const arrowRotation = qiblaDeg != null
-    ? (liveCompassEnabled && deviceHeading != null
-        ? (qiblaDeg - deviceHeading + 360) % 360
-        : qiblaDeg)
-    : 0;
+  // Arrow shows device heading when live; otherwise show Qibla bearing
+  const arrowRotation = (liveCompassEnabled && deviceHeading != null)
+    ? deviceHeading
+    : (qiblaDeg ?? 0);
 
   const FACING_THRESHOLD_DEG = 5;
   const VIBRATE_COOLDOWN_MS = 10000;
@@ -252,7 +251,8 @@ export default function QiblaPage() {
       setFacingQibla(false);
       return;
     }
-    const delta = Math.min(arrowRotation, 360 - arrowRotation);
+    const raw = (deviceHeading - qiblaDeg + 360) % 360;
+    const delta = Math.min(raw, 360 - raw);
     const isFacing = delta <= FACING_THRESHOLD_DEG;
     setFacingQibla(isFacing);
     if (isFacing) {
@@ -262,7 +262,7 @@ export default function QiblaPage() {
         setLastVibrateAt(now);
       }
     }
-  }, [arrowRotation, liveCompassEnabled, deviceHeading, qiblaDeg]);
+  }, [deviceHeading, qiblaDeg, liveCompassEnabled]);
 
   const titleText = language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction';
   const subtitleText = language === 'ar' ? 'اختر موقعك على الخريطة أو استخدم موقعك الحالي' : 'Pick a location on the map or use your current location';
