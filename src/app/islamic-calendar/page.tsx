@@ -522,9 +522,36 @@ export default function IslamicCalendar() {
                      const hasHijri = !!day?.date?.hijri?.day && !!day?.date?.hijri?.month?.number;
                      const isSpecial = hasHijri ? checkIsSpecialHijriDay(day) : false;
                      const specialInfo = hasHijri ? getSpecialHijriDayInfo(day) : null;
-                     const isToday = day?.date?.gregorian?.date 
-                       ? new Date().toDateString() === new Date(day.date.gregorian.date).toDateString()
-                       : false;
+                     const today = new Date();
+                     const gDay = today.getDate();
+                     const gMonth = today.getMonth() + 1;
+                     const gYear = today.getFullYear();
+                     const isTodayGregorian = String(day?.date?.gregorian?.day) === String(gDay)
+                       && Number(day?.date?.gregorian?.month?.number) === gMonth
+                       && String(day?.date?.gregorian?.year) === String(gYear);
+                     let isTodayHijri = false;
+                     try {
+                       const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(today);
+                       const hDay = Number(parts.find(p => p.type === 'day')?.value || 0);
+                       const hMonth = Number(parts.find(p => p.type === 'month')?.value || 0);
+                       const hYear = String(parts.find(p => p.type === 'year')?.value || '');
+                       isTodayHijri = String(day?.date?.hijri?.day) === String(hDay)
+                         && Number(day?.date?.hijri?.month?.number) === hMonth
+                         && String(day?.date?.hijri?.year) === String(hYear);
+                     } catch {
+                       try {
+                         const parts2 = new Intl.DateTimeFormat('en-u-ca-islamic', { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(today);
+                         const hDay2 = Number(parts2.find(p => p.type === 'day')?.value || 0);
+                         const hMonth2 = Number(parts2.find(p => p.type === 'month')?.value || 0);
+                         const hYear2 = String(parts2.find(p => p.type === 'year')?.value || '');
+                         isTodayHijri = String(day?.date?.hijri?.day) === String(hDay2)
+                           && Number(day?.date?.hijri?.month?.number) === hMonth2
+                           && String(day?.date?.hijri?.year) === String(hYear2);
+                       } catch {
+                         isTodayHijri = false;
+                       }
+                     }
+                     const isToday = state.calendarType === 'gregorian' ? isTodayGregorian : isTodayHijri;
 
                      return (
                     <div
