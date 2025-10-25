@@ -363,13 +363,13 @@ export default function QiblaPage() {
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-700 dark:text-gray-300">S</div>
                 <div className="absolute top-1/2 -translate-y-1/2 left-1 text-xs text-gray-700 dark:text-gray-300">W</div>
                 <div className="absolute top-1/2 -translate-y-1/2 right-1 text-xs text-gray-700 dark:text-gray-300">E</div>
-                {/* Qibla marker on rim */}
-                <div className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(${arrowRotation}deg)`, transformOrigin: 'center' }}>
-                  <div className="mt-1 flex flex-col items-center">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400">🕋 {language === 'ar' ? 'القبلة' : 'Qibla'}</div>
-                  </div>
-                </div>
+                {/* Qibla marker on rim (static bearing from North) */}
+                 <div className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(${qiblaDeg ?? 0}deg)`, transformOrigin: 'center' }}>
+                   <div className="mt-1 flex flex-col items-center">
+                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                     <div className="text-[10px] text-emerald-600 dark:text-emerald-400">🕋 {language === 'ar' ? 'القبلة' : 'Qibla'}</div>
+                   </div>
+                 </div>
                 {/* Arrow */}
                 <div className="absolute w-0 h-0 border-l-8 border-r-8 border-b-[64px] border-l-transparent border-r-transparent border-b-red-600" style={{ transform: `rotate(${arrowRotation}deg)` }} />
               </div>
