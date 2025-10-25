@@ -28,7 +28,8 @@ const Header = () => {
   const { language, setLanguage, theme, setTheme } = useApp();
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+   const [resourcesOpen, setResourcesOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -106,19 +107,32 @@ const Header = () => {
               if ((item as any).children) {
                 const children = (item as any).children as Array<{ label: string; href: string }>;
                 return (
-                  <div key="resources" className="relative group">
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200 cursor-pointer">
+                  <div
+                    key="resources"
+                    className="relative"
+                    onMouseEnter={() => setResourcesOpen(true)}
+                    onMouseLeave={() => setResourcesOpen(false)}
+                    onFocus={() => setResourcesOpen(true)}
+                    onBlur={() => setResourcesOpen(false)}
+                  >
+                    <button
+                      type="button"
+                      className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200 cursor-pointer"
+                      aria-haspopup="menu"
+                      aria-expanded={resourcesOpen}
+                    >
                       <Icon className="w-4 h-4" />
                       <span className="text-sm font-medium">{item.label}</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </div>
-                    <div className={`absolute top-full mt-2 ${language === 'ar' ? 'right-0' : 'left-0'} hidden group-hover:block bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    <div className={`absolute top-full mt-2 ${language === 'ar' ? 'right-0' : 'left-0'} ${resourcesOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}>
                       <div className="py-2">
                         {children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            onClick={() => setResourcesOpen(false)}
                           >
                             {child.label}
                           </Link>
