@@ -38,6 +38,7 @@ import PIC_Isha from '@/pic/PIC_Isha.png';
 import { getFajrOverlayContent, type FajrOverlayContent } from '@/lib/fajr-overlay-service';
 import { getSunriseOverlayContent, type SunriseOverlayContent } from '@/lib/sunrise-overlay-service';
 import { getDhuhrOverlayContent, type DhuhrOverlayContent } from '@/lib/dhuhr-overlay-service';
+import { getAsrOverlayContent, type AsrOverlayContent } from '@/lib/asr-overlay-service';
 
 interface PrayerTime {
   name: string;
@@ -84,6 +85,9 @@ export default function PrayerTimesPage() {
   const [showDhuhrInfo, setShowDhuhrInfo] = useState(false);
   const [dhuhrContent, setDhuhrContent] = useState<DhuhrOverlayContent | null>(null);
   const [dhuhrContentLoading, setDhuhrContentLoading] = useState<boolean>(true);
+  const [showAsrInfo, setShowAsrInfo] = useState(false);
+  const [asrContent, setAsrContent] = useState<AsrOverlayContent | null>(null);
+  const [asrContentLoading, setAsrContentLoading] = useState<boolean>(true);
 
   // Update current time every second
   useEffect(() => {
@@ -140,6 +144,20 @@ export default function PrayerTimesPage() {
         logger.warn('Error loading Dhuhr overlay content:', error as Error);
       } finally {
         if (active) setDhuhrContentLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const content = await getAsrOverlayContent();
+        if (active) setAsrContent(content);
+      } catch (error) {
+        logger.warn('Error loading Asr overlay content:', error as Error);
+      } finally {
+        if (active) setAsrContentLoading(false);
       }
     })();
     return () => { active = false; };
@@ -461,6 +479,53 @@ export default function PrayerTimesPage() {
         </div>
       )}
 
+      {showAsrInfo && (
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-label={language === 'ar' ? 'معلومات العصر' : 'Asr Information'}
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowAsrInfo(false); }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center z-0 pointer-events-none"
+            style={{ backgroundImage: `url(${PIC_Asr.src})` }}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/50 z-10 pointer-events-none" aria-hidden="true" />
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowAsrInfo(false); }}
+            className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
+            aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
+            <div className="max-w-2xl text-white text-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 font-amiri">
+                {language === 'ar' ? 'العصر' : 'Asr'}
+              </h2>
+              {asrContentLoading ? (
+                <div className="flex items-center justify-center">
+                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                </div>
+              ) : (
+                language === 'ar' ? (
+                  <div dir="rtl">
+                    <p className="leading-relaxed whitespace-pre-line">{asrContent?.ar}</p>
+                  </div>
+                ) : (
+                  <div dir="ltr">
+                    <p className="leading-relaxed whitespace-pre-line">{asrContent?.en}</p>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         {/* Page Title */}
         <div className="text-center mb-8">
@@ -566,7 +631,7 @@ export default function PrayerTimesPage() {
                       : prayer.isNext
                         ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
                         : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-                  } ${prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' ? 'cursor-pointer' : ''}`}
+                  } ${prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' || prayer.name.toLowerCase() === 'asr' ? 'cursor-pointer' : ''}`}
                   style={
                     prayer.name.toLowerCase() === 'fajr'
                       ? { backgroundImage: `url(${PIC_Fajr.src})` }
@@ -589,7 +654,9 @@ export default function PrayerTimesPage() {
                         ? () => setShowSunriseInfo(true) 
                         : prayer.name.toLowerCase() === 'dhuhr'
                           ? () => setShowDhuhrInfo(true)
-                          : undefined
+                          : prayer.name.toLowerCase() === 'asr'
+                            ? () => setShowAsrInfo(true)
+                            : undefined
                   }
                   onKeyDown={
                     prayer.name.toLowerCase() === 'fajr' 
@@ -598,10 +665,12 @@ export default function PrayerTimesPage() {
                         ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowSunriseInfo(true); } 
                         : prayer.name.toLowerCase() === 'dhuhr' 
                           ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowDhuhrInfo(true); } 
+                        : prayer.name.toLowerCase() === 'asr' 
+                          ? (e) => { if (e.key === 'Enter' || e.key === ' ') setShowAsrInfo(true); } 
                           : undefined
                   }
-                  role={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' ? 'button' : undefined}
-                  tabIndex={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' ? 0 : -1}
+                  role={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' || prayer.name.toLowerCase() === 'asr' ? 'button' : undefined}
+                  tabIndex={prayer.name.toLowerCase() === 'fajr' || prayer.name.toLowerCase() === 'sunrise' || prayer.name.toLowerCase() === 'dhuhr' || prayer.name.toLowerCase() === 'asr' ? 0 : -1}
                >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-full ${
