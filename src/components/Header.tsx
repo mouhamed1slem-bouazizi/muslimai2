@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -30,6 +30,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
    const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
    const [resourcesOpen, setResourcesOpen] = useState(false);
+   const closeResourcesTimer = useRef<number | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -86,6 +87,23 @@ const Header = () => {
     },
   ];
 
+  const openResources = () => {
+    if (closeResourcesTimer.current) {
+      clearTimeout(closeResourcesTimer.current);
+      closeResourcesTimer.current = null;
+    }
+    setResourcesOpen(true);
+  };
+
+  const scheduleCloseResources = () => {
+    if (closeResourcesTimer.current) {
+      clearTimeout(closeResourcesTimer.current);
+    }
+    closeResourcesTimer.current = window.setTimeout(() => {
+      setResourcesOpen(false);
+    }, 200);
+  };
+
   return (
     <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-emerald-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -110,10 +128,10 @@ const Header = () => {
                   <div
                     key="resources"
                     className="relative"
-                    onMouseEnter={() => setResourcesOpen(true)}
-                    onMouseLeave={() => setResourcesOpen(false)}
-                    onFocus={() => setResourcesOpen(true)}
-                    onBlur={() => setResourcesOpen(false)}
+                    onMouseEnter={openResources}
+                    onMouseLeave={scheduleCloseResources}
+                    onFocus={openResources}
+                    onBlur={scheduleCloseResources}
                   >
                     <button
                       type="button"
@@ -125,7 +143,13 @@ const Header = () => {
                       <span className="text-sm font-medium">{item.label}</span>
                       <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? 'rotate-180' : ''}`} />
                     </button>
-                    <div className={`absolute top-full mt-2 ${language === 'ar' ? 'right-0' : 'left-0'} ${resourcesOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}>
+                    <div
+                      className={`absolute top-full mt-0 ${language === 'ar' ? 'right-0' : 'left-0'} ${resourcesOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}
+                      onMouseEnter={openResources}
+                      onMouseLeave={scheduleCloseResources}
+                      onFocus={openResources}
+                      onBlur={scheduleCloseResources}
+                    >
                       <div className="py-2">
                         {children.map((child) => (
                           <Link
