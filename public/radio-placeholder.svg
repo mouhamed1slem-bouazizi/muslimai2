@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E6FFF4"/>
+      <stop offset="100%" stop-color="#CCFBEF"/>
+    </linearGradient>
+    <linearGradient id="darkbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1F2937"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <!-- Soft rounded card background -->
+  <rect x="8" y="8" width="112" height="112" rx="16" fill="url(#bg)" />
+  <!-- Border -->
+  <rect x="8" y="8" width="112" height="112" rx="16" fill="none" stroke="#A7F3D0" stroke-width="2"/>
+  <!-- Minimal radio icon -->
+  <g transform="translate(0,2)">
+    <rect x="32" y="48" width="64" height="40" rx="8" fill="#FFFFFF" stroke="#D1FAE5" stroke-width="2"/>
+    <!-- Dial circle -->
+    <circle cx="56" cy="68" r="10" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2"/>
+    <!-- Play triangle inside dial -->
+    <polygon points="52,63 62,68 52,73" fill="url(#accent)"/>
+    <!-- Volume bars -->
+    <rect x="74" y="60" width="8" height="4" rx="2" fill="#A7F3D0"/>
+    <rect x="74" y="66" width="14" height="4" rx="2" fill="#6EE7B7"/>
+    <rect x="74" y="72" width="20" height="4" rx="2" fill="#34D399"/>
+    <!-- Antenna -->
+    <path d="M44 48 L48 34" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="48" cy="32" r="3" fill="#10B981"/>
+    <!-- Waves -->
+    <path d="M92 44 q10 6 0 12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+    <path d="M96 40 q14 10 0 20" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

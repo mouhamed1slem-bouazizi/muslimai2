@@ -14,6 +14,7 @@ interface RadioStation {
 
 const RADIO_API = 'https://data-rosy.vercel.app/radio.json';
 const STORAGE_KEY = 'muslimai:lastRadioId';
+const PLACEHOLDER_IMG = '/radio-placeholder.svg';
 
 export default function AudioPage() {
   const { language, theme } = useApp();
@@ -148,7 +149,8 @@ export default function AudioPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={current.img} alt={current.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-emerald-100 dark:bg-gray-700" />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={PLACEHOLDER_IMG} alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'} className="w-full h-full object-cover" />
                 )}
               </div>
               <div>
@@ -228,7 +230,8 @@ export default function AudioPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={s.img} alt={s.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-emerald-100 dark:bg-gray-700" />
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={PLACEHOLDER_IMG} alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'} className="w-full h-full object-cover" />
                   )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                   {current?.id === s.id && (
