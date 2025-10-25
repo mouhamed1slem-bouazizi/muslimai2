@@ -147,10 +147,23 @@ export default function AudioPage() {
               <div className="w-14 h-14 rounded-xl overflow-hidden ring-1 ring-emerald-300/40">
                 {current?.img ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={current.img} alt={current.name} className="w-full h-full object-cover" />
+                  <img
+                    src={current.img}
+                    alt={current.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = PLACEHOLDER_IMG;
+                      e.currentTarget.onerror = null;
+                    }}
+                    decoding="async"
+                  />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={PLACEHOLDER_IMG} alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'} className="w-full h-full object-cover" />
+                  <img
+                    src={PLACEHOLDER_IMG}
+                    alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'}
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
               <div>
@@ -228,10 +241,23 @@ export default function AudioPage() {
                 <div className="relative h-24">
                   {s.img ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.img} alt={s.name} className="w-full h-full object-cover" />
+                    <img
+                      src={s.img}
+                      alt={s.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = PLACEHOLDER_IMG;
+                        e.currentTarget.onerror = null;
+                      }}
+                      decoding="async"
+                    />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={PLACEHOLDER_IMG} alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'} className="w-full h-full object-cover" />
+                    <img
+                      src={PLACEHOLDER_IMG}
+                      alt={language === 'ar' ? 'إذاعة القرآن' : 'Quran Radio'}
+                      className="w-full h-full object-cover"
+                    />
                   )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                   {current?.id === s.id && (
