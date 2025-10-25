@@ -14,6 +14,7 @@ import {
   Calendar,
   Compass,
   BookOpen,
+  ChevronDown,
   Volume2,
   MessageCircle,
   User,
@@ -27,6 +28,7 @@ const Header = () => {
   const { language, setLanguage, theme, setTheme } = useApp();
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -63,7 +65,13 @@ const Header = () => {
     { 
       icon: BookOpen, 
       label: language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources', 
-      href: '/resources' 
+      children: [
+        { label: language === 'ar' ? 'أسماء الله الحسنى' : 'Asma al Husna', href: '/asma-al-husna' },
+        { label: language === 'ar' ? 'القرآن' : 'Quran', href: '/quran' },
+        { label: language === 'ar' ? 'التفسير' : 'Tafsir', href: '/tafsir' },
+        { label: language === 'ar' ? 'الحديث' : 'Hadith', href: '/hadith' },
+        { label: language === 'ar' ? 'الأذكار' : 'Adhkar', href: '/adhkar' },
+      ],
     },
     { 
       icon: Volume2, 
@@ -95,10 +103,35 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
             {menuItems.map((item) => {
               const Icon = item.icon;
+              if ((item as any).children) {
+                const children = (item as any).children as Array<{ label: string; href: string }>;
+                return (
+                  <div key="resources" className="relative group">
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200 cursor-pointer">
+                      <Icon className="w-4 h-4" />
+                      <span className="text-sm font-medium">{item.label}</span>
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                    <div className={`absolute top-full mt-2 ${language === 'ar' ? 'right-0' : 'left-0'} hidden group-hover:block bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}>
+                      <div className="py-2">
+                        {children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={(item as any).href}
+                  href={(item as any).href}
                   className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200"
                 >
                   <Icon className="w-4 h-4" />
@@ -204,10 +237,41 @@ const Header = () => {
             <nav className="flex flex-col space-y-3">
               {menuItems.map((item) => {
                 const Icon = item.icon;
+                if ((item as any).children) {
+                  const children = (item as any).children as Array<{ label: string; href: string }>;
+                  return (
+                    <div key="resources" className="p-2">
+                      <button
+                        onClick={() => setMobileDropdownOpen((v) => !v)}
+                        className="flex w-full items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                      >
+                        <span className="flex items-center space-x-3 rtl:space-x-reverse">
+                          <Icon className="w-5 h-5" />
+                          <span className="font-medium">{item.label}</span>
+                        </span>
+                        <ChevronDown className={`w-5 h-5 transition-transform ${mobileDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {mobileDropdownOpen && (
+                        <div className="mt-2 pl-8 space-y-2">
+                          {children.map((child) => (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              className="block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
                 return (
                   <Link
-                    key={item.href}
-                    href={item.href}
+                    key={(item as any).href}
+                    href={(item as any).href}
                     className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
