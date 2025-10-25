@@ -238,9 +238,9 @@ export default function QiblaPage() {
     };
   }, []);
 
-  // Arrow shows device heading when live; otherwise show Qibla bearing
-  const arrowRotation = (liveCompassEnabled && deviceHeading != null)
-    ? deviceHeading
+  // Arrow: in live mode, point straight up when heading equals Qibla
+  const arrowRotation = (liveCompassEnabled && deviceHeading != null && qiblaDeg != null)
+    ? ((deviceHeading - qiblaDeg + 360) % 360)
     : (qiblaDeg ?? 0);
 
   const FACING_THRESHOLD_DEG = 5;
@@ -363,8 +363,8 @@ export default function QiblaPage() {
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-700 dark:text-gray-300">S</div>
                 <div className="absolute top-1/2 -translate-y-1/2 left-1 text-xs text-gray-700 dark:text-gray-300">W</div>
                 <div className="absolute top-1/2 -translate-y-1/2 right-1 text-xs text-gray-700 dark:text-gray-300">E</div>
-                {/* Qibla marker on rim (static bearing from North) */}
-                 <div className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(${qiblaDeg ?? 0}deg)`, transformOrigin: 'center' }}>
+                {/* Qibla marker fixed at top (12 o’clock) */}
+                 <div className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(0deg)`, transformOrigin: 'center' }}>
                    <div className="mt-1 flex flex-col items-center">
                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
                      <div className="text-[10px] text-emerald-600 dark:text-emerald-400">🕋 {language === 'ar' ? 'القبلة' : 'Qibla'}</div>
