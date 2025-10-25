@@ -49,8 +49,9 @@ export default function AsmaAlHusnaPage() {
       try {
         const res = await fetch(`https://api.aladhan.com/v1/asmaAlHusna/${num}`, { cache: 'no-store' });
         const json = await res.json();
-        const d: AsmaItem = json?.data || json;
-        setFeatured(d);
+        const payload = json?.data;
+        const d: AsmaItem = Array.isArray(payload) ? payload[0] : payload;
+        setFeatured(d || null);
       } catch (e) {
         setFeatured(null);
       } finally {
@@ -78,26 +79,31 @@ export default function AsmaAlHusnaPage() {
 
   useEffect(() => {
     if (!featured) return;
-    const nameAr = featured.name;
-    const nameEn = featured.transliteration || nameAr;
+    const nameAr = featured.name || '';
+    const nameEn = featured.transliteration || nameAr || '';
     const enPrompt = `Explain the meaning, context, and virtues of the Name of Allah \"${nameEn}\" (Arabic: ${nameAr}). Keep it concise (80-120 words). Output in English.`;
     const arPrompt = `اشرح معنى وسياق وفضائل اسم الله \"${nameEn}\" (العربية: ${nameAr}) باختصار (٨٠-١٢٠ كلمة). باللغة العربية.`;
+    setAiEn('');
+    setAiAr('');
     const fetchAI = async () => {
       try {
-        const [enRes, arRes] = await Promise.all([
-          fetch(`https://text.pollinations.ai/${encodeURIComponent(enPrompt)}`, { cache: 'no-store' }),
-          fetch(`https://text.pollinations.ai/${encodeURIComponent(arPrompt)}`, { cache: 'no-store' }),
-        ]);
-        setAiEn(await enRes.text());
-        setAiAr(await arRes.text());
+        if (language === 'ar') {
+          const arRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(arPrompt)}`, { cache: 'no-store' });
+          setAiAr(await arRes.text());
+        } else {
+          const enRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(enPrompt)}`, { cache: 'no-store' });
+          setAiEn(await enRes.text());
+        }
       } catch {}
     };
     fetchAI();
-  }, [featured]);
+  }, [featured, language]);
 
   const meaningFrom = (item: AsmaItem | null) => {
     if (!item) return '';
-    return item.en?.meaning || item.ar?.meaning || '';
+    return language === 'ar'
+      ? (item.ar?.meaning || item.en?.meaning || '')
+      : (item.en?.meaning || item.ar?.meaning || '');
   };
 
   return (
@@ -122,19 +128,19 @@ export default function AsmaAlHusnaPage() {
                 </div>
                 <div className="md:col-span-2">
                   <p className="text-gray-700 dark:text-gray-300 mb-3">{meaningFrom(featured)}</p>
-                  {aiEn && (
+                  {language !== 'ar' && aiEn && (
                     <div className="mb-2">
                       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Insight (EN)</h3>
                       <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{aiEn}</p>
                     </div>
                   )}
-                  {aiAr && (
+                  {language === 'ar' && aiAr && (
                     <div className="mb-2">
                       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">شرح (AR)</h3>
                       <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed font-amiri">{aiAr}</p>
                     </div>
                   )}
-                  {!aiEn && !aiAr && (
+                  {((language === 'en' && !aiEn) || (language === 'ar' && !aiAr)) && (
                     <p className="text-gray-500 dark:text-gray-500 text-sm">Loading commentary…</p>
                   )}
                 </div>
