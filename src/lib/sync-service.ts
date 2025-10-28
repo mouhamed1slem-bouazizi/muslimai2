@@ -27,6 +27,11 @@ export interface UserProfile {
     prayerReminders: boolean;
     adhanSound: boolean;
   };
+  quranProgress?: {
+    lastPage_en?: number;
+    lastPage_ar?: number;
+    lastUpdated?: Date;
+  };
   preferences?: {
     notificationsEnabled?: boolean;
     soundEnabled?: boolean;

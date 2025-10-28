@@ -32,6 +32,11 @@ interface UserProfile {
     prayerReminders: boolean;
     adhanSound: boolean;
   };
+  quranProgress?: {
+    lastPage_en?: number;
+    lastPage_ar?: number;
+    lastUpdated?: Date;
+  };
   preferences?: {
     notificationsEnabled?: boolean;
     soundEnabled?: boolean;
@@ -207,6 +212,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         notifications: {
           prayerReminders: true,
           adhanSound: true,
+        },
+        quranProgress: {
+          lastPage_en: 1,
+          lastPage_ar: 1,
+          lastUpdated: new Date(),
         },
         createdAt: new Date(),
         updatedAt: new Date(),
