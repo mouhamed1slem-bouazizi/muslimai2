@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getStoryById } from '@/lib/stories-service';
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+// Align with Next.js 16 typed route handlers where context.params is a Promise
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const id = params?.id;
+    const { id } = await context.params;
     if (!id) {
       return NextResponse.json({ code: 400, status: 'Bad Request', error: 'Missing id' }, { status: 400 });
     }
