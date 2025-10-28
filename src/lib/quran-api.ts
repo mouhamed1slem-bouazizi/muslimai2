@@ -59,8 +59,8 @@ export type QuranIndexes = {
 };
 
 const memoryCache: {
-  data?: Record<LanguageCode, QuranData>;
-  indexes?: Record<LanguageCode, QuranIndexes>;
+  data: Partial<Record<LanguageCode, QuranData>>;
+  indexes: Partial<Record<LanguageCode, QuranIndexes>>;
 } = { data: {}, indexes: {} };
 
 const LS_KEY_DATA = (lang: LanguageCode) => `quran_data_${lang}_v1`;
