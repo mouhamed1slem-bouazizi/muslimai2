@@ -1,4 +1,4 @@
-'use server';
+'use strict';
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -36,13 +36,14 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3, backo
   throw lastErr;
 }
 
-export async function GET(req: NextRequest, ctx: { params: { lang: string } }) {
-  const lang = (ctx.params.lang || '').toLowerCase() as LanguageCode;
-  if (lang !== 'ar' && lang !== 'en') {
+export async function GET(req: NextRequest, context: { params: Promise<{ lang: string }> }) {
+  const { lang } = await context.params;
+  const normalized = (lang || '').toLowerCase() as LanguageCode;
+  if (normalized !== 'ar' && normalized !== 'en') {
     return NextResponse.json({ code: 400, status: 'invalid_language' }, { status: 400 });
   }
 
-  const url = UPSTREAM[lang];
+  const url = UPSTREAM[normalized];
   try {
     const res = await fetchWithRetry(url, { headers: { 'Accept': 'application/json' } });
     const json = await res.json();
