@@ -26,6 +26,13 @@ export default function QuranPage() {
 
   // Track last saved pages per language to avoid duplicate writes
   const lastSavedRef = useRef<{ ar?: number; en?: number }>({});
+  const updateProfileRef = useRef(updateUserProfile);
+  const quotaBlockedRef = useRef(false);
+
+  // Keep a stable reference to updateUserProfile to avoid effect re-runs on provider render
+  useEffect(() => {
+    updateProfileRef.current = updateUserProfile;
+  }, [updateUserProfile]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +101,7 @@ export default function QuranPage() {
     } catch {}
 
     if (!user) return; // only save for authenticated users
+    if (quotaBlockedRef.current) return; // stop attempts if quota exceeded
 
     // Skip if we already saved this exact page for the current language
     const alreadySaved = lang === "ar" ? lastSavedRef.current.ar : lastSavedRef.current.en;
@@ -107,7 +115,7 @@ export default function QuranPage() {
           [lang === "ar" ? "lastPage_ar" : "lastPage_en"]: currentPage,
           lastUpdated: new Date(),
         };
-        await updateUserProfile({ quranProgress: progress });
+        await updateProfileRef.current({ quranProgress: progress });
         // Remember last saved to prevent duplicate writes
         if (lang === "ar") {
           lastSavedRef.current.ar = currentPage;
@@ -116,13 +124,17 @@ export default function QuranPage() {
         }
       } catch (e) {
         // Errors are handled in AuthContext; keep UI smooth
+        const msg = String((e as any)?.message || e);
+        if (msg.includes("Quota exceeded") || msg.includes("resource-exhausted")) {
+          quotaBlockedRef.current = true;
+        }
       }
     }, SAVE_DEBOUNCE_MS);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [currentPage, lang, user, updateUserProfile]);
+  }, [currentPage, lang, user]);
 
   const pageContent = useMemo(() => (indexes ? getPageContent(indexes, currentPage) : { page: currentPage, entries: [] }), [indexes, currentPage]);
 
@@ -429,7 +441,7 @@ export default function QuranPage() {
           {/* Navigation */}
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700">
             <button
-              onClick={() => goToPage(currentPage - 1)}
+              onClick={() => { goToPage(currentPage - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage <= 1}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -437,7 +449,7 @@ export default function QuranPage() {
               {lang === 'ar' ? 'الصفحة السابقة' : 'Previous Page'}
             </button>
             <button
-              onClick={() => goToPage(currentPage + 1)}
+              onClick={() => { goToPage(currentPage + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={currentPage >= TOTAL_PAGES}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
             >
