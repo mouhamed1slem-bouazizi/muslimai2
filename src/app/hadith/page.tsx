@@ -20,14 +20,14 @@ export default function HadithPage() {
   const { language, theme } = useApp();
   const initialLang: HadithLang = language === 'ar' ? 'ar' : 'en';
   const [lang, setLang] = useState<HadithLang>(initialLang);
-  const [edition, setEdition] = useState<HadithEdition>('bukhari');
+  const [edition, setEdition] = useState<HadithEdition>('nawawi');
   const [query, setQuery] = useState('');
   const [sectionId, setSectionId] = useState<string>('');
   const [hadiths, setHadiths] = useState<HadithItem[]>([]);
   const [sections, setSections] = useState<{ id: string; name: string; first?: number; last?: number }[]>([]);
   const [bookName, setBookName] = useState<string>('');
   const [pageIndex, setPageIndex] = useState<number>(0);
-  const [perPage, setPerPage] = useState<number>(20);
+  const [perPage, setPerPage] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -50,9 +50,7 @@ export default function HadithPage() {
     } catch {}
   }, [lang, edition, pageIndex]);
 
-  useEffect(() => {
-    fetchHadithInfo().catch(() => {});
-  }, []);
+  // Remove heavy info.json prefetch to speed up first render
 
   useEffect(() => {
     let cancelled = false;

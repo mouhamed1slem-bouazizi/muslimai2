@@ -27,7 +27,8 @@ async function fetchWithRetry(url: string, attempts = 3, timeoutMs = 15000): Pro
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), timeoutMs);
-      const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
+      // Allow upstream/CDN caching; avoid disabling cache on this proxy fetch
+      const res = await fetch(url, { signal: ctrl.signal });
       clearTimeout(t);
       if (res.ok) return res;
       lastErr = new Error(`Upstream error ${res.status}`);
@@ -38,6 +39,10 @@ async function fetchWithRetry(url: string, attempts = 3, timeoutMs = 15000): Pro
   }
   throw lastErr ?? new Error("Failed to fetch upstream");
 }
+
+// Simple in-memory cache to avoid repeated heavy upstream fetches per lang/edition
+const memoryCache: Map<string, { ts: number; data: any }> = new Map();
+const TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 
 export async function GET(request: NextRequest, context: { params: Promise<{ lang?: string; edition?: string }> }) {
   const params = await context.params;
@@ -53,8 +58,19 @@ export async function GET(request: NextRequest, context: { params: Promise<{ lan
 
   const url = upstreamUrl(lang, edition);
   try {
+    const key = `${lang}:${edition}`;
+    const now = Date.now();
+    const cached = memoryCache.get(key);
+    if (cached && now - cached.ts < TTL_MS) {
+      const headers = {
+        "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+      } as Record<string, string>;
+      return NextResponse.json(cached.data, { status: 200, headers });
+    }
+
     const res = await fetchWithRetry(url, 3);
     const data = await res.json();
+    memoryCache.set(key, { ts: now, data });
     // Cache for 1 day; allow stale while revalidate to reduce load
     const headers = {
       "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
