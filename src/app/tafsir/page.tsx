@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Header from '@/components/Header';
 import { useApp } from '../providers';
 import { ChevronLeft, ChevronRight, Loader2, Info } from 'lucide-react';
-import { getMetadata, type LanguageCode } from '@/lib/quran-api';
+import { fetchQuran, getMetadata, type LanguageCode, type Ayah } from '@/lib/quran-api';
 import { fetchTafsir, type TafsirVerse } from '@/lib/tafsir-api';
 
 const LS_LAST_SURA = (lang: LanguageCode) => `tafsir_last_sura_${lang}`;
@@ -22,6 +22,7 @@ export default function TafsirPage() {
   const [metadata, setMetadata] = useState<{ surahs: Array<{ number: number; nameAr: string; nameEn: string; translation: string }>; totalPages: number; totalJuz: number; totalManzil: number } | null>(null);
   const [currentSura, setCurrentSura] = useState<number>(1);
   const [verses, setVerses] = useState<TafsirVerse[]>([]);
+  const [surahAyahs, setSurahAyahs] = useState<Ayah[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +59,19 @@ export default function TafsirPage() {
         if (!cancelled) setLoading(false);
       });
     try { localStorage.setItem(LS_LAST_SURA(lang), String(currentSura)); } catch {}
+    return () => { cancelled = true; };
+  }, [lang, currentSura]);
+
+  // Fetch surah ayahs for currentSura and language
+  useEffect(() => {
+    let cancelled = false;
+    fetchQuran(lang)
+      .then((data) => {
+        if (cancelled) return;
+        const sura = data.surahs.find(s => s.number === currentSura);
+        setSurahAyahs(sura ? sura.ayahs : []);
+      })
+      .catch(() => { /* best-effort; tafsir still shows */ })
     return () => { cancelled = true; };
   }, [lang, currentSura]);
 
@@ -149,21 +163,32 @@ export default function TafsirPage() {
             <div className="text-center text-red-600 dark:text-red-400">{lang === 'ar' ? 'حدث خطأ أثناء التحميل' : 'An error occurred while loading'}</div>
           ) : (
             <div className="space-y-6" dir={dir}>
-              {verses.map((v, idx) => (
-                <div key={`${currentSura}-${v.ayah}-${idx}`} className="">
-                  <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">
-                    {lang === 'ar' ? `آية ${v.ayah}` : `Ayah ${v.ayah}`}
-                  </div>
-                  <div className={`text-lg leading-relaxed ${lang === 'ar' ? 'font-amiri' : ''}`}>
-                    {v.text}
-                  </div>
-                  {v.footnotes && (
-                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      {v.footnotes}
+              {verses.map((v, idx) => {
+                const ayah = surahAyahs.find(a => a.numberInSurah === v.ayah);
+                return (
+                  <div key={`${currentSura}-${v.ayah}-${idx}`} className="">
+                    {/* Ayah label */}
+                    <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                      {lang === 'ar' ? `آية ${v.ayah}` : `Ayah ${v.ayah}`}
                     </div>
-                  )}
-                </div>
-              ))}
+                    {/* Ayah text */}
+                    {ayah && (
+                      <div className={`mb-2 text-xl ${lang === 'ar' ? 'font-amiri leading-relaxed' : 'leading-relaxed'}`}>
+                        {ayah.text}
+                      </div>
+                    )}
+                    {/* Tafsir text */}
+                    <div className={`text-lg ${lang === 'ar' ? 'font-amiri' : ''} leading-relaxed`}>
+                      {v.text}
+                    </div>
+                    {v.footnotes && (
+                      <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        {v.footnotes}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               {/* Empty state */}
               {verses.length === 0 && (
                 <div className="text-center text-gray-600 dark:text-gray-400">
