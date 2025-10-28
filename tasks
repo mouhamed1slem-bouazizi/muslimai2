@@ -1,10 +1,8 @@
 
-Add Islamic/Hijri calendar and Ramadan calendar features
+ Quran, Tafsir, Hadith, and Adhkar pages
 
-Implement Qibla direction with compass and Google Maps integration
 
-Add Asma al Husna, Quran, Tafsir, Hadith, and Adhkar sections
-
-Implement audio player for 18 Quran reciters and radio stations
-
+unstead of Islamic Special Days list in islamic-calendar page let's put 
+a islamic story and use AI to give us any random islamic story from the history
+and for every 24 hours give us new story. in arabic and english.
 

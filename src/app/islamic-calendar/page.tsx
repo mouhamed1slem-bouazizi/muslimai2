@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../providers';
 import Header from '@/components/Header';
+import IslamicStoryCard from '@/components/IslamicStoryCard';
 import { 
   Calendar, 
   Clock, 
@@ -660,35 +661,8 @@ export default function IslamicCalendar() {
           </div>
         </div>
 
-        {/* Special Days List */}
-        {state.specialDays.length > 0 && (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center font-amiri">
-              {language === 'ar' ? 'المناسبات الإسلامية' : 'Islamic Special Days'}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {state.specialDays.map((day, index) => (
-                <div
-                  key={index}
-                  className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-4 text-white"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Star className="w-5 h-5" />
-                    <div className="text-sm font-medium">
-                      {language === 'ar' ? `${formatNumberForLanguage(day.day, language)} ${state.islamicMonths.find(m => m.number === day.month)?.ar}` 
-                                         : `${day.day} ${state.islamicMonths.find(m => m.number === day.month)?.en}`}
-                    </div>
-                  </div>
-                  <div className="font-amiri text-lg">
-                    {language === 'ar' 
-                      ? (day.name?.ar ?? day.name?.en ?? '') 
-                      : (day.name?.en ?? day.name?.ar ?? '')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Featured Islamic Story (replaces Special Days list) */}
+        <IslamicStoryCard />
 
         {/* Islamic Months Reference */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700">
