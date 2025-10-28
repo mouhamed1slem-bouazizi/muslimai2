@@ -33,9 +33,10 @@ export type QuranResponse = {
 
 export type LanguageCode = 'ar' | 'en';
 
+// Route through our server-side proxy to avoid client-side cross-origin/network issues
 const ENDPOINTS: Record<LanguageCode, string> = {
-  ar: 'https://api.alquran.cloud/v1/quran/quran-uthmani',
-  en: 'https://api.alquran.cloud/v1/quran/en.asad',
+  ar: '/api/quran/ar',
+  en: '/api/quran/en',
 };
 
 type PageIndexEntry = {
