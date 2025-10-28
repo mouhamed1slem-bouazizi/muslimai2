@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Header from "@/components/Header";
 import { useApp } from "../providers";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,15 +13,19 @@ import {
   type QuranData,
   type QuranIndexes,
 } from "@/lib/quran-api";
-import { ChevronLeft, ChevronRight, Loader2, Bookmark, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Bookmark, Filter, Info, Play, Pause } from "lucide-react";
 
 const LS_LAST_PAGE = (lang: LanguageCode) => `quran_last_page_${lang}`;
 const TOTAL_PAGES = 604;
+const SAVE_DEBOUNCE_MS = 1200; // debounce saving to avoid rapid writes
 
 export default function QuranPage() {
   const { language, theme } = useApp();
   const { user, userProfile, updateUserProfile } = useAuth();
   const lang = (language === "ar" ? "ar" : "en") as LanguageCode;
+
+  // Track last saved pages per language to avoid duplicate writes
+  const lastSavedRef = useRef<{ ar?: number; en?: number }>({});
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,13 +80,26 @@ export default function QuranPage() {
     };
   }, [lang]);
 
-  // Persist page progress
+  // Keep ref in sync when profile changes (no writes here)
   useEffect(() => {
+    lastSavedRef.current.ar = userProfile?.quranProgress?.lastPage_ar;
+    lastSavedRef.current.en = userProfile?.quranProgress?.lastPage_en;
+  }, [userProfile]);
+
+  // Persist page progress with debounce and loop guard
+  useEffect(() => {
+    // Always update local storage for resume even if offline
     try {
       localStorage.setItem(LS_LAST_PAGE(lang), String(currentPage));
     } catch {}
-    const saveProgress = async () => {
-      if (!user) return;
+
+    if (!user) return; // only save for authenticated users
+
+    // Skip if we already saved this exact page for the current language
+    const alreadySaved = lang === "ar" ? lastSavedRef.current.ar : lastSavedRef.current.en;
+    if (alreadySaved === currentPage) return;
+
+    const timer = window.setTimeout(async () => {
       try {
         const prev = userProfile?.quranProgress || {};
         const progress = {
@@ -91,14 +108,46 @@ export default function QuranPage() {
           lastUpdated: new Date(),
         };
         await updateUserProfile({ quranProgress: progress });
+        // Remember last saved to prevent duplicate writes
+        if (lang === "ar") {
+          lastSavedRef.current.ar = currentPage;
+        } else {
+          lastSavedRef.current.en = currentPage;
+        }
       } catch (e) {
-        // Errors are surfaced by AuthContext; keep UI smooth
+        // Errors are handled in AuthContext; keep UI smooth
       }
+    }, SAVE_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timer);
     };
-    saveProgress();
-  }, [currentPage, lang, user, userProfile, updateUserProfile]);
+  }, [currentPage, lang, user, updateUserProfile]);
 
   const pageContent = useMemo(() => (indexes ? getPageContent(indexes, currentPage) : { page: currentPage, entries: [] }), [indexes, currentPage]);
+
+  // Group ayahs by surah to render headers similar to classic mushaf view
+  const groupedBySurah = useMemo(() => {
+    const groups: Array<{ surahNumber: number; surahNameAr: string; surahNameEn: string; ayahs: typeof pageContent.entries }>
+      = [];
+    let current: { surahNumber: number; surahNameAr: string; surahNameEn: string; ayahs: typeof pageContent.entries } | null = null;
+    for (const e of pageContent.entries) {
+      if (!current || current.surahNumber !== e.surahNumber) {
+        current = {
+          surahNumber: e.surahNumber,
+          surahNameAr: e.surahNameAr,
+          surahNameEn: e.surahNameEn,
+          ayahs: [],
+        };
+        groups.push(current);
+      }
+      current.ayahs.push(e);
+    }
+    return groups;
+  }, [pageContent]);
+
+  const BISMILLAH = "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ";
+  const [infoOpenSurah, setInfoOpenSurah] = useState<number | null>(null);
 
   const calmCard = theme === "dark" ? "bg-gray-800/80 border-gray-700" : "bg-white/85 border-white/30";
   const heading = lang === "ar" ? "القرآن الكريم" : "Holy Quran";
@@ -271,8 +320,9 @@ export default function QuranPage() {
               {userProfile?.quranProgress && (
                 <button
                   onClick={() => {
-                    const p = lang === 'ar' ? userProfile.quranProgress.lastPage_ar : userProfile.quranProgress.lastPage_en;
-                    if (p) goToPage(p);
+                    const qp = userProfile?.quranProgress;
+                    const p = lang === 'ar' ? qp?.lastPage_ar : qp?.lastPage_en;
+                    if (typeof p === 'number' && p > 0) goToPage(p);
                   }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm"
                 >
@@ -293,23 +343,85 @@ export default function QuranPage() {
             ) : error ? (
               <div className="text-center text-red-600 dark:text-red-400">{error}</div>
             ) : (
-              <div className="space-y-4">
-                {pageContent.entries.length === 0 && (
+              <div className="space-y-10">
+                {groupedBySurah.length === 0 && (
                   <div className="text-center text-gray-600 dark:text-gray-400">{lang === 'ar' ? 'لا توجد آيات لهذه الصفحة' : 'No ayahs for this page'}</div>
                 )}
-                {pageContent.entries.map((e, idx) => (
-                  <div key={`${e.surahNumber}-${e.ayah.number}-${idx}`} className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {lang === 'ar' ? `سورة ${e.surahNameAr}` : `Surah ${e.surahNameEn}`} — {lang === 'ar' ? `آية ${e.ayah.numberInSurah}` : `Ayah ${e.ayah.numberInSurah}`}
+
+                {groupedBySurah.map((group, idx) => (
+                  <div key={`surah-${group.surahNumber}`} className="px-2">
+                    {/* Surah header */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setInfoOpenSurah(infoOpenSurah === group.surahNumber ? null : group.surahNumber)}
+                          className="flex items-center gap-1 text-sm text-gray-300 hover:text-white"
+                        >
+                          <Info className="w-4 h-4" /> {lang === 'ar' ? 'معلومات السورة' : 'Surah Info'}
+                        </button>
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Juz {e.ayah.juz} • Manzil {e.ayah.manzil} • Ruku {e.ayah.ruku} • Hizb {e.ayah.hizbQuarter}
+                      <div className="text-center flex-1">
+                    <h2 className="font-amiri text-3xl md:text-4xl text-white">{lang === 'ar' ? group.surahNameAr : `Surah ${group.surahNameEn}`}</h2>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {/* Audio button placeholder */}
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 text-sm text-teal-300 hover:text-teal-200"
+                          onClick={() => {
+                            // Navigate to Audio page for full player
+                            window.location.href = '/audio';
+                          }}
+                        >
+                          <Play className="w-4 h-4" /> {lang === 'ar' ? 'تشغيل الصوت' : 'Play Audio'}
+                        </button>
                       </div>
                     </div>
-                    <div className={`${lang === 'ar' ? 'font-amiri text-2xl leading-relaxed' : 'font-serif text-lg'} text-gray-900 dark:text-white`}>{e.ayah.text}</div>
+
+                    {/* Surah info collapsible */}
+                    {infoOpenSurah === group.surahNumber && (
+                      <div className={`mb-4 mx-auto max-w-2xl rounded-xl border ${calmCard} px-4 py-3 text-sm text-gray-700 dark:text-gray-300`}> 
+                        {data && (
+                          (() => {
+                            const meta = data.surahs.find(s => s.number === group.surahNumber);
+                            return meta ? (
+                              <div className="flex flex-wrap items-center justify-center gap-4">
+                                <div>{lang === 'ar' ? `عدد الآيات: ${meta.ayahs.length}` : `Ayahs: ${meta.ayahs.length}`}</div>
+                                <div>{lang === 'ar' ? `ترجمة الاسم: ${meta.englishNameTranslation}` : `Translation: ${meta.englishNameTranslation}`}</div>
+                                <div>{lang === 'ar' ? `مكان النزول: ${meta.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}` : `Revelation: ${meta.revelationType}`}</div>
+                              </div>
+                            ) : null;
+                          })()
+                        )}
+                      </div>
+                    )}
+
+                    {/* Bismillah — show ONLY on the first page and first surah block */}
+                    {pageContent.page === 1 && idx === 0 && (
+                      <div className="text-center mb-6" id="bismillah-first-page">
+                        <div className="font-amiri text-2xl md:text-3xl text-emerald-300">{BISMILLAH}</div>
+                      </div>
+                    )}
+
+                    {/* Ayahs block */}
+                    <div className="text-center space-y-6">
+                      {group.ayahs.map((e, idx) => (
+                        <div key={`${group.surahNumber}-${e.ayah.number}-${idx}`} className="mx-auto max-w-3xl">
+                          <div className={`${lang === 'ar' ? 'font-amiri text-3xl leading-loose' : 'font-serif text-2xl leading-relaxed'} text-white`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                            {e.ayah.text}
+                            <span className="inline-flex items-center justify-center align-middle ms-3 translate-y-1 rounded-full border border-teal-400 text-teal-300 w-8 h-8 text-sm">
+                              {e.ayah.numberInSurah}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
+
+                {/* Page number footer */}
+                <div className="mt-10 text-center text-gray-400">{pageContent.page}</div>
               </div>
             )}
           </div>
