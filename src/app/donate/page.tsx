@@ -21,17 +21,19 @@ export default function DonatePage() {
             {isArabic ? 'التبرع' : 'Donate'}
           </h1>
 
+          {/* Paragraph 1 - Applying new, improved Arabic/English text to the original P tag structure */}
           <p className={`text-lg mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
             {isArabic
-              ? 'نحن نعمل على بناء ذكاء اصطناعي إسلامي لخدمة المسلمين حول العالم، وتحسين هذا التطبيق ليكون أكثر فائدة وسهولة. تبرعكم يساعدنا في تطوير الميزات، تحسين الأداء، وتمويل البنية التحتية والبحث.'
-              : 'We are building Islamic AI to serve Muslims worldwide and improving this app to be more helpful and accessible. Your donation helps us develop features, improve performance, and fund infrastructure and research.'
+              ? 'في عالم تزداد فيه سرعة المعلومات، نسعى لضمان أن تبقى المعرفة الإسلامية الصحيحة متاحة بدقة وسهولة. مشروعنا الطموح: بناء أول ذكاء اصطناعي إسلامي موثوق، يعمل كمرجع شامل ودائم لملايين المسلمين.'
+              : 'In a world where information speed is increasing, we strive to ensure that accurate Islamic knowledge remains available with precision and ease. Our ambitious project: Building the first trusted Islamic Artificial Intelligence, which serves as a comprehensive and permanent reference for millions of Muslims.'
             }
           </p>
 
+          {/* Paragraph 2 - Applying the 'Sadaqah Jariyah' and conclusion text to the original P tag structure */}
           <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-6`}>
             {isArabic
-              ? 'بدعمكم، نستطيع مواصلة بناء أدوات تعليمية وروحية نافعة، وتقديم تجربة سلسة للمستخدمين. جزاكم الله خيرًا على دعمكم للفريق ولمشروعنا.'
-              : 'With your support, we can continue building beneficial educational and spiritual tools and deliver a smooth experience for users. JazakAllahu khayran for supporting our team and this project.'
+              ? 'تبرعك ليس مجرد دعم مالي؛ بل هو استثمار في صدقة جارية لا ينقطع أجرها، يساهم في نشر العلم الشرعي، تطوير الأدوات، وخدمة الأمة حول العالم. بمقدار دعمكم، ينتشر أثرنا. جزاكم الله خيراً وبارك في رزقكم.'
+              : 'Your donation is not just financial support; rather, it is an investment in an ongoing charity (Sadaqah Jāriyah) whose reward never ceases, contributing to spreading Sacred Knowledge, developing tools, and serving the Ummah worldwide. The greater your support, the wider our impact. May Allah reward you well and bless your sustenance.'
             }
           </p>
 

@@ -280,13 +280,13 @@ export default function Home() {
             } backdrop-blur-sm`}
             >
               <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white font-amiri">
-                {language === 'ar' ? 'ادعم مشروعنا' : 'Support Our Project'}
+                {language === 'ar' ? 'كن شريكاً في العلم والأجر 💡' : 'Partner in Knowledge and Reward 💡'}
               </h3>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
                 {language === 'ar'
-                  ? 'مرة واحدة فقط: نرجو دعمكم بتبرع بسيط لمساعدتنا في بناء ذكاء اصطناعي إسلامي وتحسين التطبيق.'
-                  : 'One-time only: Please consider a small donation to help us build Islamic AI and improve the app.'
-                }
+                  ? 'لا تجعل العلم يقف عند حدود البشر! ساهم معنا في بناء أول منصة ذكاء اصطناعي إسلامي، لتكون مرجعاً شاملاً ودقيقاً يخدم ملايين المسلمين. تبرعك صدقة جارية في نشر العلم بإذن الله.'
+                  : "Don't Let Knowledge Stop at Human Limits! Contribute with us to build the first Islamic AI platform, a comprehensive and accurate reference serving millions of Muslims. Your donation is an ongoing charity (Sadaqah Jāriyah) in spreading knowledge, God willing."
+                }
               </p>
               <div className="flex items-center gap-3">
                 <a
