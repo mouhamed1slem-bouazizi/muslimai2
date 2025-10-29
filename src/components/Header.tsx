@@ -21,7 +21,6 @@ import {
   LogOut,
   Settings
 } from 'lucide-react';
-import SyncStatus from './SyncStatus';
 import { logger } from '@/lib/logger';
 
 const Header = () => {
@@ -181,9 +180,6 @@ const Header = () => {
 
           {/* Controls */}
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            {/* Sync Status */}
-            {user && <SyncStatus />}
-            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
