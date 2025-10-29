@@ -1,0 +1,398 @@
+﻿
+			"TITLE": "أذكار الصباح والمساء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/27.json"
+		
+			"TITLE": "أذكار النوم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/28.json"
+		
+			"TITLE": "أذكار الاستيقاظ من النوم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/1.json"
+		
+			"TITLE": "دعاء دخول الخلاء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/6.json"
+	
+			"TITLE": "دعاء الخروج من الخلاء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/7.json"
+	
+			"TITLE": "الذكر قبل الوضوء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/8.json"
+		
+			"TITLE": "الذكر بعد الفراغ من الوضوء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/9.json"
+	
+			"TITLE": "الذكر عند الخروج من المنزل",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/10.json"
+		
+			"TITLE": "الذكر عند دخول المنزل",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/11.json"
+		
+			"TITLE": "دعاء الذهاب إلى المسجد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/12.json"
+		
+			"TITLE": "دعاء دخول المسجد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/13.json"
+		
+			"TITLE": "دعاء الخروج من المسجد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/14.json"
+		
+			"TITLE": "أذكار الآذان",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/15.json"
+		
+			"TITLE": "دعاء ُلبْس الثوب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/2.json"
+	
+			"TITLE": "دعاء ُلبْس الثوب الجديد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/3.json"
+		
+			"TITLE": "الدعاء لمن لبس ثوبا جديدا",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/4.json"
+	
+			"TITLE": "ما يقول إذا وضع ثوبه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/5.json"
+	
+			"TITLE": "دعاء الاستفتاح",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/16.json"
+		
+			"TITLE": "دعاء الركوع",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/17.json"
+	
+			"TITLE": "دعاء الرفع من الركوع",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/18.json"
+		
+			"TITLE": "دعاء السجود",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/19.json"
+	
+			"TITLE": "دعاء الجلسة بين السجدتين",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/20.json"
+	
+			"TITLE": "دعاء سجود التلاوة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/21.json"
+		
+			"TITLE": "التشهد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/22.json"
+
+			"TITLE": "الصلاة على النبي بعد التشهد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/23.json"
+	
+			"TITLE": "الدعاء بعد التشهد الأخير قبل السلام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/24.json"
+
+			"TITLE": "الأذكار بعد السلام من الصلاة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/25.json"
+	
+			"TITLE": "دعاء صلاة الاستخارة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/26.json"
+	
+			"TITLE": "الدعاء إذا تقلب ليلا",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/29.json"
+	
+			"TITLE": "دعاء الفزع في النوم و من بُلِيَ بالوحشة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/30.json"
+	
+			"TITLE": "ما يفعل من رأى الرؤيا أو الحلم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/31.json"
+	
+			"TITLE": "دعاء قنوت الوتر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/32.json"
+	
+			"TITLE": "الذكر عقب السلام من الوتر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/33.json"
+	
+			"TITLE": "دعاء الهم والحزن",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/34.json"
+	
+			"TITLE": "دعاء الكرب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/35.json"
+		
+			"TITLE": "دعاء لقاء العدو و ذي السلطان",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/36.json"
+	
+			"TITLE": "دعاء من خاف ظلم السلطان",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/37.json"
+	
+			"TITLE": "الدعاء على العدو",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/38.json"
+	
+			"TITLE": "ما يقول من خاف قوما",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/39.json"
+		
+			"TITLE": "دعاء من أصابه وسوسة في الإيمان",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/40.json"
+	
+			"TITLE": "دعاء قضاء الدين",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/41.json"
+		
+			"TITLE": "دعاء الوسوسة في الصلاة و القراءة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/42.json"
+	
+			"TITLE": "دعاء من استصعب عليه أمر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/43.json"
+		
+			"TITLE": "ما يقول ويفعل من أذنب ذنبا",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/44.json"
+		
+			"TITLE": "دعاء طرد الشيطان و وساوسه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/45.json"
+	
+			"TITLE": "الدعاء حينما يقع ما لا يرضاه أو ُ غلب على أمره",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/46.json"
+		
+			"TITLE": "ﺗﻬنئة المولود له وجوابه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/47.json"
+	
+			"TITLE": "ما يعوذ به الأولاد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/48.json"
+	
+			"TITLE": "الدعاء للمريض في عيادته",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/49.json"
+		
+			"TITLE": "فضل عيادة المريض",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/50.json"
+		
+			"TITLE": "دعاء المريض الذي يئس من حياته",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/51.json"
+	
+			"TITLE": "تلقين المحتضر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/52.json"
+		
+			"TITLE": "دعاء من أصيب بمصيبة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/53.json"
+		
+			"TITLE": "الدعاء عند إغماض الميت",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/54.json"
+		
+			"TITLE": "الدعاء للميت في الصلاة عليه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/55.json"
+		
+			"TITLE": "الدعاء للفرط في الصلاة عليه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/56.json"
+		
+			"TITLE": "دعاء التعزية",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/57.json"
+	
+			"TITLE": "الدعاء عند إدخال الميت القبر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/58.json"
+	
+			"TITLE": "الدعاء بعد دفن الميت",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/59.json"
+		
+			"TITLE": "دعاء زيارة القبور",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/60.json"
+	
+			"TITLE": "دعاء الريح",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/61.json"
+		
+			"TITLE": "دعاء الرعد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/62.json"
+		
+			"TITLE": "من أدعية الاستسقاء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/63.json"
+		
+			"TITLE": "الدعاء إذا نزل المطر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/64.json"
+		
+			"TITLE": "الذكر بعد نزول المطر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/65.json"
+		
+			"TITLE": "من أدعية الاستصحاء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/66.json"
+	
+			"TITLE": "دعاء رؤية الهلال",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/67.json"
+	
+			"TITLE": "الدعاء عند إفطار الصائم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/68.json"
+		
+			"TITLE": "الدعاء قبل الطعام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/69.json"
+		
+			"TITLE": "الدعاء عند الفراغ من الطعام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/70.json"
+	
+			"TITLE": "دعاء الضيف لصاحب الطعام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/71.json"
+	
+			"TITLE": "التعريض بالدعاء لطلب الطعام أو الشراب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/72.json"
+	
+			"TITLE": "الدعاء إذا أفطر عند أهل بيت",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/73.json"
+		
+			"TITLE": "دعاء الصائم إذا حضر الطعام ولم يفطر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/74.json"
+
+			"TITLE": "ما يقول الصائم إذا سابه أحد",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/75.json"
+	
+			"TITLE": "الدعاء عند رؤية باكورة الثمر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/76.json"
+	
+			"TITLE": "دعاء العطاس",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/77.json"
+	
+			"TITLE": "ما يقال للكافر إذا عطس فحمد الله",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/78.json"
+	
+			"TITLE": "الدعاء للمتزوج",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/79.json"
+	
+			"TITLE": "دعاء المتزوج و شراء الدابة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/80.json"
+	
+			"TITLE": "الدعاء قبل إتيان الزوجة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/81.json"
+	
+			"TITLE": "دعاء الغضب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/82.json"
+	
+			"TITLE": "دعاء من رأى مبتلى",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/83.json"
+	
+			"TITLE": "ما يقال في اﻟﻤﺠلس",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/84.json"
+	
+			"TITLE": "كفارة اﻟﻤﺠلس",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/85.json"
+	
+			"TITLE": "الدعاء لمن قال غفر الله لك",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/87.json"
+	
+			"TITLE": "الدعاء لمن صنع إليك معروفا",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/87.json"
+	
+			"TITLE": "ما يعصم الله به من الدجال",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/88.json"
+	
+			"TITLE": "الدعاء لمن قال إني أحبك في الله",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/89.json"
+	
+			"TITLE": "الدعاء لمن عرض عليك ماله",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/90.json"
+	
+			"TITLE": "الدعاء لمن أقرض عند القضاء",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/91.json"
+	
+			"TITLE": "دعاء الخوف من الشرك",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/92.json"
+	
+			"TITLE": "الدعاء لمن قال بارك الله فيك",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/93.json"
+
+			"TITLE": "دعاء كراهية الطيرة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/94.json"
+	
+			"TITLE": "دعاء الركوب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/95.json"
+
+			"TITLE": "دعاء السفر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/96.json"
+	
+			"TITLE": "دعاء دخول القرية أو البلدة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/97.json"
+
+			"TITLE": "دعاء دخول السوق",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/98.json"
+	
+			"TITLE": "الدعاء إذا تعس المركوب",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/99.json"
+
+			"TITLE": "دعاء المسافر للمقيم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/100.json"
+	
+			"TITLE": "دعاء المقيم للمسافر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/101.json"
+	
+			"TITLE": "التكبير و التسبيح في سير السفر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/102.json"
+	
+			"TITLE": "دعاء المسافر إذا أسحر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/103.json"
+
+			"TITLE": "الدعاء إذا نزل مترلا في سفر أو غيره",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/104.json"
+
+			"TITLE": "ذكر الرجوع من السفر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/105.json"
+
+			"TITLE": "ما يقول من أتاه أمر يسره أو يكرهه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/106.json"
+	
+			"TITLE": "فضل الصلاة على النبي صلى الله عليه و سلم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/107.json"
+
+			"TITLE": "إفشاء السلام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/108.json"
+
+			"TITLE": "كيف يرد السلام على الكافر إذا سلم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/109.json"
+
+			"TITLE": "الدُّعاءُ عِنْدَ سَمَاعِ صِياحِ الدِّيكِ ونَهِيقِ الْحِمَارِ",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/110.json"
+
+			"TITLE": "دعاء نباح الكلاب بالليل",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/111.json"
+
+			"TITLE": "الدعاء لمن سببته",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/112.json"
+
+			"TITLE": "ما يقول المسلم إذا مدح المسلم",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/113.json"
+
+			"TITLE": "ما يقول المسلم إذا زكي",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/114.json"
+
+			"TITLE": "كيف يلبي المحرم في الحج أو العمرة ؟",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/115.json"
+
+			"TITLE": "التكبير إذا أتى الركن الأسود",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/116.json"
+
+			"TITLE": "الدعاء بين الركن اليماني والحجر الأسود",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/117.json"
+
+			"TITLE": "دعاء الوقوف على الصفا والمروة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/118.json"
+
+			"TITLE": "الدعاء يوم عرفة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/119.json"
+	
+			"TITLE": "الذكر عند المشعر الحرام",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/120.json"
+	
+			"TITLE": "التكبير عند رمي الجمار مع كل حصاة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/121.json"
+	
+			"TITLE": "دعاء التعجب والأمر السار",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/122.json"
+	
+			"TITLE": "ما يفعل من أتاه أمر يسره",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/123.json"
+	
+			"TITLE": "ما يقول من أحس وجعا في جسده",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/124.json"
+	
+			"TITLE": "دعاء من خشي أن يصيب شيئا بعينه",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/125.json"
+	
+			"TITLE": "ما يقال عند الفزع",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/126.json"
+		
+			"TITLE": "ما يقول عند الذبح أو النحر",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/127.json"
+	
+			"TITLE": "ما يقول لرد كيد مردة الشياطين",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/128.json"
+	
+			"TITLE": "الاستغفار و التوبة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/129.json"
+	
+			"TITLE": "فضل التسبيح و التحميد، و التهليل، و التكبير",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/130.json"
+		
+			"TITLE": "كيف كان النبي يسبح؟",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/131.json"
+		
+		
+			"TITLE": "من أنواع الخير والآداب الجامعة",
+			"TEXT": "http://www.hisnmuslim.com/api/ar/132.json"
+	
