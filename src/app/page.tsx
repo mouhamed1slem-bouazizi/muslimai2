@@ -41,6 +41,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
   const [prayerData, setPrayerData] = useState<PrayerTimesData | null>(null);
+  const [showDonatePopup, setShowDonatePopup] = useState(false);
 
   // Update current time every second
   useEffect(() => {
@@ -50,6 +51,27 @@ export default function Home() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Show donate popup once per user after login/signup
+  useEffect(() => {
+    try {
+      const uid = user?.uid || 'anon';
+      const key = `donate_popup_shown:${uid}`;
+      const alreadyShown = typeof window !== 'undefined' ? localStorage.getItem(key) : 'true';
+      if (!alreadyShown && user) {
+        setShowDonatePopup(true);
+      }
+    } catch {}
+  }, [user]);
+
+  const dismissDonatePopup = (markShown: boolean = true) => {
+    try {
+      const uid = user?.uid || 'anon';
+      const key = `donate_popup_shown:${uid}`;
+      if (markShown && typeof window !== 'undefined') localStorage.setItem(key, 'true');
+    } catch {}
+    setShowDonatePopup(false);
+  };
 
   // Calculate prayer times when location changes
   useEffect(() => {
@@ -250,6 +272,40 @@ export default function Home() {
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {showDonatePopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => dismissDonatePopup(true)} />
+            <div className={`relative z-10 w-full max-w-md rounded-2xl p-6 border ${
+              theme === 'dark' ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-emerald-200'
+            } backdrop-blur-sm`}
+            >
+              <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white font-amiri">
+                {language === 'ar' ? 'ادعم مشروعنا' : 'Support Our Project'}
+              </h3>
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
+                {language === 'ar'
+                  ? 'مرة واحدة فقط: نرجو دعمكم بتبرع بسيط لمساعدتنا في بناء ذكاء اصطناعي إسلامي وتحسين التطبيق.'
+                  : 'One-time only: Please consider a small donation to help us build Islamic AI and improve the app.'
+                }
+              </p>
+              <div className="flex items-center gap-3">
+                <a
+                  href="/donate"
+                  onClick={() => dismissDonatePopup(true)}
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 transition-colors"
+                >
+                  {language === 'ar' ? 'اذهب لصفحة التبرع' : 'Go to Donate Page'}
+                </a>
+                <button
+                  onClick={() => dismissDonatePopup(true)}
+                  className={`px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700'} hover:opacity-80 transition-opacity`}
+                >
+                  {language === 'ar' ? 'لاحقًا' : 'Later'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri">
@@ -415,6 +471,21 @@ export default function Home() {
           <cite className="text-white/80">
             {language === 'ar' ? 'سورة العنكبوت - آية 45' : 'Quran 29:45'}
           </cite>
+        </div>
+
+        {/* Bottom Donate Button */}
+        <div className="mt-8 text-center">
+          <p className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {language === 'ar' 
+              ? 'ساعدنا في تطوير التطبيق عبر التبرع'
+              : 'Help us improve the app by donating'}
+          </p>
+          <a
+            href="/donate"
+            className="inline-block px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+          >
+            {language === 'ar' ? 'صفحة التبرع' : 'Donate Page'}
+          </a>
         </div>
       </main>
     </div>
