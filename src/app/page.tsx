@@ -217,7 +217,7 @@ export default function Home() {
       icon: Calendar,
       title: language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar',
       description: language === 'ar' ? 'التقويم الهجري وتقويم رمضان' : 'Hijri calendar and Ramadan calendar',
-      href: '/calendar'
+      href: '/islamic-calendar'
     },
     {
       icon: Compass,
@@ -229,7 +229,7 @@ export default function Home() {
       icon: BookOpen,
       title: language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources',
       description: language === 'ar' ? 'القرآن والتفسير والأحاديث والأذكار' : 'Quran, Tafsir, Hadith, and Adhkar',
-      href: '/resources'
+      href: '/quran'
     },
     {
       icon: Volume2,
