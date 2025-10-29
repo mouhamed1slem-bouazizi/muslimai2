@@ -8,9 +8,13 @@ import { fetchAdhkar } from '@/lib/adhkar-api';
 import type { AdhkarMenuItem as ArabicMenuItem, AdhkarContentItem as ArabicContentItem } from '@/lib/adhkar-list';
 import { fetchArabicMenu, fetchArabicCategoryItems } from '@/lib/adhkar-list';
 
+// Ensure this page renders client-first to avoid hydration mismatches
+export const dynamic = 'force-dynamic';
+
 export default function AdhkarPage() {
   const { language: appLanguage, theme } = useApp();
   const lang: AdhkarLang = appLanguage === 'ar' ? 'ar' : 'en';
+  const [mounted, setMounted] = useState(false);
   const [categories, setCategories] = useState<AdhkarCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,7 @@ export default function AdhkarPage() {
 
   // Load content based on language: Arabic uses menu-driven categories; English loads combined adhkar
   useEffect(() => {
-    let mounted = true;
+    let isActive = true;
     setError(null);
     if (lang === 'ar') {
       // Arabic flow
@@ -41,7 +45,7 @@ export default function AdhkarPage() {
       setSelectedMenu(null);
       fetchArabicMenu()
         .then((menu) => {
-          if (!mounted) return [] as ArabicContentItem[];
+          if (!isActive) return [] as ArabicContentItem[];
           setArMenu(menu);
           const first = menu[0] ?? null;
           setSelectedMenu(first ?? null);
@@ -51,15 +55,15 @@ export default function AdhkarPage() {
           return [] as ArabicContentItem[];
         })
         .then((items) => {
-          if (!mounted) return;
+          if (!isActive) return;
           setArItems(items);
         })
         .catch((err) => {
-          if (!mounted) return;
+          if (!isActive) return;
           setError(String(err?.message ?? err));
         })
         .finally(() => {
-          if (!mounted) return;
+          if (!isActive) return;
           setArLoading(false);
         });
       setLoading(false);
@@ -68,20 +72,24 @@ export default function AdhkarPage() {
       setLoading(true);
       fetchAdhkar('en')
         .then((data) => {
-          if (!mounted) return;
+          if (!isActive) return;
           setCategories(data);
         })
         .catch((err) => {
-          if (!mounted) return;
+          if (!isActive) return;
           setError(String(err?.message ?? err));
         })
         .finally(() => {
-          if (!mounted) return;
+          if (!isActive) return;
           setLoading(false);
         });
     }
-    return () => { mounted = false; };
+    return () => { isActive = false; };
   }, [lang]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // When Arabic selected menu changes, load category items
   useEffect(() => {
@@ -147,10 +155,24 @@ export default function AdhkarPage() {
 
   // No manual language toggle; respects app language only
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" suppressHydrationWarning>
+          <div className={`rounded-2xl shadow-2xl p-4 md:p-6 border ${calmCard} mt-6`}>
+            <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+            <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir={textDir}>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir={textDir} suppressHydrationWarning>
         <h1 className={`text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1 ${isRTL ? 'font-amiri' : ''} text-center`}>{title}</h1>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-4">{subtitle}</p>
         {/* Language is controlled by app settings; no manual toggle */}

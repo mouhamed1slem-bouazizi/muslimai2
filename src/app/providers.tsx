@@ -28,6 +28,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatches by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // Load saved preferences from localStorage
@@ -65,6 +71,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     localStorage.setItem('theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  if (!mounted) {
+    // Render a minimal placeholder to avoid SSR/client text differences
+    return <div suppressHydrationWarning />;
+  }
 
   return (
     <AuthProvider>
