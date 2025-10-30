@@ -39,10 +39,13 @@ export default function DonatePage() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <a
-              href="#"
+              href="https://patreon.com/TechBreak?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 transition-colors"
+              aria-label={isArabic ? 'التبرع عبر Patreon (يفتح في نافذة جديدة)' : 'Donate via Patreon (opens in new tab)'}
             >
-              {isArabic ? 'تبرع الآن' : 'Donate Now'}
+              {isArabic ? 'تبرع الآن عبر Patreon' : 'Donate Now on Patreon'}
             </a>
             <a
               href="/"
@@ -54,8 +57,8 @@ export default function DonatePage() {
 
           <div className={`mt-6 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             {isArabic
-              ? 'ملاحظة: سيتم إضافة رابط آمن للتبرع قريبًا. نشكركم على نيتكم الطيبة.'
-              : 'Note: A secure donation link will be added soon. Thank you for your kind intention.'
+              ? 'هذا الرابط سيفتح في متصفحك صفحة Patreon الخاصة بنا للتبرع. وفقًا لقواعد Apple، يجب أن تتم التبرعات عبر رابط خارجي في المتصفح.'
+              : 'This link opens in your browser to our Patreon page to donate. Per Apple policy, donations must proceed via an external browser link.'
             }
           </div>
         </div>
