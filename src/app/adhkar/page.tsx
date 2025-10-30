@@ -6,7 +6,7 @@ import { useApp } from '../providers';
 import type { AdhkarCategory, AdhkarLang } from '@/lib/adhkar-api';
 import { fetchAdhkar } from '@/lib/adhkar-api';
 import type { AdhkarMenuItem as ArabicMenuItem, AdhkarContentItem as ArabicContentItem } from '@/lib/adhkar-list';
-import { fetchArabicMenu, fetchArabicCategoryItems } from '@/lib/adhkar-list';
+import { fetchArabicMenu, fetchArabicCategoryItems, fetchEnglishMenu, fetchEnglishCategoryItems } from '@/lib/adhkar-list';
 
 // Ensure this page renders client-first to avoid hydration mismatches
 export const dynamic = 'force-dynamic';
@@ -23,6 +23,11 @@ export default function AdhkarPage() {
   const [selectedMenu, setSelectedMenu] = useState<ArabicMenuItem | null>(null);
   const [arItems, setArItems] = useState<ArabicContentItem[]>([]);
   const [arLoading, setArLoading] = useState<boolean>(false);
+  // English menu driven state
+  const [enMenu, setEnMenu] = useState<ArabicMenuItem[]>([]);
+  const [selectedEnMenu, setSelectedEnMenu] = useState<ArabicMenuItem | null>(null);
+  const [enItems, setEnItems] = useState<ArabicContentItem[]>([]);
+  const [enLoading, setEnLoading] = useState<boolean>(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentAudio, setCurrentAudio] = useState<{ src: string; title: string; itemKey?: string | number } | null>(null);
@@ -68,12 +73,25 @@ export default function AdhkarPage() {
         });
       setLoading(false);
     } else {
-      // English flow
-      setLoading(true);
-      fetchAdhkar('en')
-        .then((data) => {
+      // English flow (menu-driven, mirroring Arabic template)
+      setEnLoading(true);
+      setEnItems([]);
+      setEnMenu([]);
+      setSelectedEnMenu(null);
+      fetchEnglishMenu()
+        .then((menu) => {
+          if (!isActive) return [] as ArabicContentItem[];
+          setEnMenu(menu);
+          const first = menu[0] ?? null;
+          setSelectedEnMenu(first ?? null);
+          if (first) {
+            return fetchEnglishCategoryItems(first.url);
+          }
+          return [] as ArabicContentItem[];
+        })
+        .then((items) => {
           if (!isActive) return;
-          setCategories(data);
+          setEnItems(items);
         })
         .catch((err) => {
           if (!isActive) return;
@@ -81,8 +99,9 @@ export default function AdhkarPage() {
         })
         .finally(() => {
           if (!isActive) return;
-          setLoading(false);
+          setEnLoading(false);
         });
+      setLoading(false);
     }
     return () => { isActive = false; };
   }, [lang]);
@@ -104,6 +123,20 @@ export default function AdhkarPage() {
       .finally(() => { if (!mounted) return; setArLoading(false); });
     return () => { mounted = false; };
   }, [lang, selectedMenu?.url]);
+
+  // When English selected menu changes, load category items
+  useEffect(() => {
+    let mounted = true;
+    if (lang !== 'en') return () => { mounted = false; };
+    if (!selectedEnMenu?.url) return () => { mounted = false; };
+    setEnLoading(true);
+    setError(null);
+    fetchEnglishCategoryItems(selectedEnMenu.url)
+      .then((items) => { if (!mounted) return; setEnItems(items); })
+      .catch((err) => { if (!mounted) return; setError(String(err?.message ?? err)); })
+      .finally(() => { if (!mounted) return; setEnLoading(false); });
+    return () => { mounted = false; };
+  }, [lang, selectedEnMenu?.url]);
 
   useEffect(() => {
     // Wire audio element events
@@ -268,86 +301,90 @@ export default function AdhkarPage() {
               </section>
             </div>
           ) : (
-            // English combined view (unchanged from earlier implementation)
-            <div>
-              {loading && (
-                <p className="text-gray-700 dark:text-gray-300 text-center">Loading...</p>
-              )}
-              {!loading && !error && categories.length === 0 && (
-                <p className="text-gray-700 dark:text-gray-300 text-center">No data available</p>
-              )}
-              {!loading && !error && categories.length > 0 && (
-                <div className="space-y-6">
-                  {categories.map((cat, idx) => (
-                    <section key={cat.id ?? idx} className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 md:p-5 bg-white/70 dark:bg-gray-800/60">
-                      <div className="flex items-center justify-between">
-                        <h2 className={`text-lg md:text-xl font-semibold text-emerald-700 dark:text-emerald-300 ${isRTL ? 'font-amiri' : ''}`}>{cat.title}</h2>
-                        {cat.audio ? (
+            // English menu-driven view (matching Arabic template)
+            <div className="grid grid-cols-12 gap-4" dir={textDir}>
+              <aside className="col-span-12 md:col-span-4 lg:col-span-3">
+                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 p-3">
+                  <h2 className={`text-base font-semibold text-emerald-700 dark:text-emerald-300 mb-2`}>Menu</h2>
+                  {enLoading && enMenu.length === 0 ? (
+                    <p className="text-gray-700 dark:text-gray-300">Loading...</p>
+                  ) : (
+                    <ul className={`space-y-2`}>
+                      {enMenu.map((m) => (
+                        <li key={m.url}>
                           <button
-                            onClick={() => playAudio(cat.audio!, `${cat.title} — Audio`)}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm"
+                            onClick={() => setSelectedEnMenu(m)}
+                            className={`w-full text-sm px-3 py-2 rounded-md border ${selectedEnMenu?.url === m.url ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/50'} text-gray-900 dark:text-gray-100 text-left`}
                           >
-                            <span>{currentAudio?.src === cat.audio && isPlaying ? 'Pause' : 'Play'}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                              <path d="M7 6v12l10-6-10-6z" />
-                            </svg>
+                            {m.title}
                           </button>
-                        ) : (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">No section audio</span>
-                        )}
-                      </div>
-
-                      <div className="mt-3 space-y-3">
-                        {cat.content.map((c, cIdx) => {
-                          const itemKey = c.id ?? `${idx}:${cIdx}`;
-                          const audioUrl = c.audio || cat.audio || '';
-                          const playingThis = currentAudio?.itemKey === itemKey || currentAudio?.src === audioUrl;
-                          return (
-                            <article key={itemKey} className={`rounded-lg p-3 border ${playingThis ? 'border-emerald-400 dark:border-emerald-500' : 'border-gray-200 dark:border-gray-700'} bg-white/60 dark:bg-gray-800/50`}>
-                              <p className={`text-gray-900 dark:text-gray-100 ${textAlign} ${bodyFont}`}>{c.text}</p>
-                              <div className={`mt-2 flex items-center justify-between`}>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
-                                  {c.repeat ? (
-                                    <span>{`Repeat: ${c.repeat}`}</span>
-                                  ) : (
-                                    <span className="opacity-70">—</span>
-                                  )}
-                                  {c.source ? (
-                                    <span className={`ml-3 opacity-80`}>{`Source: ${c.source}`}</span>
-                                  ) : null}
-                                </div>
-                                {audioUrl ? (
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      onClick={() => playAudio(audioUrl, `${cat.title}`, itemKey)}
-                                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${playingThis && isPlaying ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
-                                    >
-                                      <span>{(playingThis && isPlaying) ? 'Pause' : 'Play'}</span>
-                                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                        <path d="M7 6v12l10-6-10-6z" />
-                                      </svg>
-                                    </button>
-                                    {playingThis && (
-                                      <button
-                                        onClick={stopAudio}
-                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm"
-                                      >
-                                        Stop
-                                      </button>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">No audio</span>
-                                )}
-                              </div>
-                            </article>
-                          );
-                        })}
-                      </div>
-                    </section>
-                  ))}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              )}
+              </aside>
+
+              <section className="col-span-12 md:col-span-8 lg:col-span-9">
+                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 p-3">
+                  <h3 className={`text-lg md:text-xl font-semibold text-emerald-700 dark:text-emerald-300 mb-2`}>{selectedEnMenu?.title ?? 'Select from menu'}</h3>
+                  {enLoading && (
+                    <p className="text-gray-700 dark:text-gray-300">Loading...</p>
+                  )}
+                  {!enLoading && enItems.length === 0 && (
+                    <p className="text-gray-700 dark:text-gray-300">No items</p>
+                  )}
+                  {!enLoading && enItems.length > 0 && (
+                    <div className="space-y-3">
+                      {enItems.map((c, idx) => {
+                        const itemKey = c.id ?? `${selectedEnMenu?.url}:${idx}`;
+                        const audioUrl = c.audio || '';
+                        const playingThis = currentAudio?.itemKey === itemKey || (audioUrl && currentAudio?.src === audioUrl);
+                        return (
+                          <article key={itemKey} className={`rounded-lg p-3 border ${playingThis ? 'border-emerald-400 dark:border-emerald-500' : 'border-gray-200 dark:border-gray-700'} bg-white/60 dark:bg-gray-800/50`}>
+                            <p className={`text-gray-900 dark:text-gray-100 text-left`}>{c.text}</p>
+                            <div className={`mt-2 flex items-center justify-between`}>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">
+                                {c.repeat ? (
+                                  <span>{`Repeat: ${c.repeat}`}</span>
+                                ) : (
+                                  <span className="opacity-70">—</span>
+                                )}
+                                {c.source ? (
+                                  <span className={`ml-3 opacity-80`}>{`Source: ${c.source}`}</span>
+                                ) : null}
+                              </div>
+                              {audioUrl ? (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => playAudio(audioUrl, `${selectedEnMenu?.title ?? ''}`, itemKey)}
+                                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${playingThis && isPlaying ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
+                                  >
+                                    <span>{(playingThis && isPlaying) ? 'Pause' : 'Play'}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                      <path d="M7 6v12l10-6-10-6z" />
+                                    </svg>
+                                  </button>
+                                  {playingThis && (
+                                    <button
+                                      onClick={stopAudio}
+                                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm"
+                                    >
+                                      Stop
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-gray-500 dark:text-gray-400">No audio</span>
+                              )}
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
           )}
         </div>

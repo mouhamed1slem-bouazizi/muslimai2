@@ -9,7 +9,7 @@ function isAllowedUrl(urlStr: string): boolean {
     const u = new URL(urlStr);
     const host = u.hostname.toLowerCase();
     const allowedHost = host === "hisnmuslim.com" || host === "www.hisnmuslim.com";
-    const allowedPath = u.pathname.startsWith("/api/ar/");
+    const allowedPath = u.pathname.startsWith("/api/ar/") || u.pathname.startsWith("/api/en/");
     return allowedHost && allowedPath;
   } catch {
     return false;
