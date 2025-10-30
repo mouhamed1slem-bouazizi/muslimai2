@@ -842,7 +842,7 @@ export default function PrayerTimesPage() {
                 </div>
                 
                 <div className="text-center">
-                  <h3 className="text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 font-amiri">
+                  <h3 className="text-xl md:text-4xl font-semibold text-gray-300 dark:text-gray-200 mb-2 font-amiri">
                     {getPrayerDisplayName(prayer)}
                   </h3>
                   <div className={`text-2xl font-bold ${
