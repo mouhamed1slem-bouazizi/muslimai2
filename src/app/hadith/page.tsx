@@ -211,7 +211,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'اللغة للتنزيل' : 'Download language'}
                 value={dlLang}
                 onChange={(e) => setDlLang(e.target.value as HadithLang)}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 <option value="ar">Arabic</option>
                 <option value="en">English</option>
@@ -220,7 +220,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'كتاب الحديث' : 'Hadith book'}
                 value={dlEdition}
                 onChange={(e) => setDlEdition(e.target.value as HadithEdition)}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 {EDITION_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -243,7 +243,7 @@ export default function HadithPage() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => { try { localStorage.setItem('hadith_onboarding_done', 'online'); } catch {}; setShowOnboarding(false); }}
-                className="px-3 py-2 border rounded text-sm"
+                className="px-3 py-2 border rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 {isArabic ? 'استخدام عبر الإنترنت الآن' : 'Use online now'}
               </button>
@@ -270,7 +270,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'اللغة' : 'Language'}
                 value={lang}
                 onChange={(e) => setLang(e.target.value as HadithLang)}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 <option value="ar">Arabic</option>
                 <option value="en">English</option>
@@ -279,7 +279,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'المجموعة' : 'Edition'}
                 value={edition}
                 onChange={(e) => setEdition(e.target.value as HadithEdition)}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 {EDITION_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -287,7 +287,7 @@ export default function HadithPage() {
               </select>
               <button
                 onClick={() => setShowBatch(true)}
-                className="px-2 py-1 rounded text-sm border"
+                className="px-2 py-1 rounded text-sm border bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 {isArabic ? 'تنزيل كتب متعددة' : 'Download multiple'}
               </button>
@@ -298,7 +298,7 @@ export default function HadithPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={isArabic ? 'ابحث في نص الحديث' : 'Search hadith text'}
-                className="w-full border rounded px-3 py-2 text-sm"
+                className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
             <div>
@@ -306,7 +306,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'القسم' : 'Section'}
                 value={sectionId}
                 onChange={(e) => { setSectionId(e.target.value); setPageIndex(0); scrollToTop(); }}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 <option value="">{isArabic ? 'كل الأقسام' : 'All sections'}</option>
                 {sections.map((s) => (
@@ -323,7 +323,7 @@ export default function HadithPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { if (pageIndex > 0) { setPageIndex(pageIndex - 1); scrollToTop(); } }}
-                className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                 disabled={pageIndex === 0}
               >
                 {isArabic ? 'السابق' : 'Previous'}
@@ -333,7 +333,7 @@ export default function HadithPage() {
               </span>
               <button
                 onClick={() => { if (pageIndex < (pages.length - 1)) { setPageIndex(pageIndex + 1); scrollToTop(); } }}
-                className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                className="px-3 py-1 border rounded text-sm disabled:opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                 disabled={pageIndex >= (pages.length - 1)}
               >
                 {isArabic ? 'التالي' : 'Next'}
@@ -342,7 +342,7 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'لكل صفحة' : 'Per page'}
                 value={perPage}
                 onChange={(e) => { setPerPage(parseInt(e.target.value, 10)); setPageIndex(0); }}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 {[10, 20, 50].map((n) => (
                   <option key={n} value={n}>{n} / {isArabic ? 'صفحة' : 'page'}</option>
@@ -369,7 +369,7 @@ export default function HadithPage() {
                       </div>
                     )}
                   </div>
-                  <p className={isArabic ? 'text-xl leading-9' : 'text-base leading-7'}>{h.text}</p>
+                  <p className={`${isArabic ? 'text-xl leading-9' : 'text-base leading-7'} text-gray-900 dark:text-white`}>{h.text}</p>
                   {h.grades && h.grades.length > 0 && (
                     <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
                       {(isArabic ? 'الدرجة' : 'Grades') + ': '}
@@ -396,21 +396,21 @@ export default function HadithPage() {
                 aria-label={isArabic ? 'اللغة' : 'Language'}
                 value={batchLang}
                 onChange={(e) => setBatchLang(e.target.value as HadithLang)}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
               >
                 <option value="ar">Arabic</option>
                 <option value="en">English</option>
               </select>
-              <button onClick={selectAllBatch} className="px-2 py-1 border rounded text-sm">
+              <button onClick={selectAllBatch} className="px-2 py-1 border rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 {isArabic ? 'تحديد الكل' : 'Select all'}
               </button>
-              <button onClick={clearBatchSelection} className="px-2 py-1 border rounded text-sm">
+              <button onClick={clearBatchSelection} className="px-2 py-1 border rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 {isArabic ? 'إلغاء التحديد' : 'Clear'}
               </button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
               {EDITION_OPTIONS.map((opt) => (
-                <label key={opt.id} className="flex items-center gap-2 text-sm">
+                <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-900 dark:text-gray-200">
                   <input
                     type="checkbox"
                     checked={selectedBatch.includes(opt.id)}
@@ -423,7 +423,7 @@ export default function HadithPage() {
             {selectedBatch.length > 0 && (
               <div className="space-y-2 mb-3">
                 {selectedBatch.map((ed) => (
-                  <div key={ed} className="text-xs">
+                  <div key={ed} className="text-xs text-gray-900 dark:text-gray-200">
                     <div className="flex items-center justify-between">
                       <span>{ed}</span>
                       <span>
@@ -443,14 +443,14 @@ export default function HadithPage() {
                       />
                     </div>
                     {batchErrors[ed] && (
-                      <div className="text-red-600">{batchErrors[ed]}</div>
+                      <div className="text-red-600 dark:text-red-400">{batchErrors[ed]}</div>
                     )}
                   </div>
                 ))}
               </div>
             )}
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowBatch(false)} className="px-3 py-2 border rounded text-sm">
+              <button onClick={() => setShowBatch(false)} className="px-3 py-2 border rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                 {isArabic ? 'إغلاق' : 'Close'}
               </button>
               <button

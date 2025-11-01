@@ -172,12 +172,12 @@ export default function TafsirPage() {
                     </div>
                     {/* Ayah text */}
                     {ayah && (
-                      <div className={`mb-2 text-xl ${lang === 'ar' ? 'font-amiri leading-relaxed' : 'leading-relaxed'}`}>
+                      <div className={`mb-2 text-xl text-gray-900 dark:text-white ${lang === 'ar' ? 'font-amiri leading-relaxed' : 'leading-relaxed'}`}>
                         {ayah.text}
                       </div>
                     )}
                     {/* Tafsir text */}
-                    <div className={`text-lg ${lang === 'ar' ? 'font-amiri' : ''} leading-relaxed`}>
+                    <div className={`text-lg text-gray-800 dark:text-gray-200 ${lang === 'ar' ? 'font-amiri' : ''} leading-relaxed`}>
                       {v.text}
                     </div>
                     {v.footnotes && (

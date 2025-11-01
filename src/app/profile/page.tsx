@@ -425,25 +425,26 @@ export default function ProfilePage() {
               aria-label={language === 'ar' ? 'اللغة' : 'Language'}
               value={batchLang}
               onChange={(e) => setBatchLang(e.target.value as HadithLang)}
-              className="border rounded px-2 py-1 text-sm"
+              className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
             >
               <option value="ar">Arabic</option>
               <option value="en">English</option>
             </select>
-            <button onClick={selectAllBatch} className="px-2 py-1 border rounded text-sm">
+            <button onClick={selectAllBatch} className="px-2 py-1 border rounded text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">
               {language === 'ar' ? 'تحديد الكل' : 'Select all'}
             </button>
-            <button onClick={clearBatchSelection} className="px-2 py-1 border rounded text-sm">
+            <button onClick={clearBatchSelection} className="px-2 py-1 border rounded text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">
               {language === 'ar' ? 'إلغاء التحديد' : 'Clear'}
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
             {EDITION_OPTIONS.map((opt) => (
-              <label key={opt.id} className="flex items-center gap-2 text-sm">
+              <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
                 <input
                   type="checkbox"
                   checked={selectedBatch.includes(opt.id)}
                   onChange={() => toggleBatchEdition(opt.id)}
+                  className="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                 />
                 <span>{opt.label}</span>
               </label>
@@ -452,10 +453,10 @@ export default function ProfilePage() {
           {selectedBatch.length > 0 && (
             <div className="space-y-2 mb-3">
               {selectedBatch.map((ed) => (
-                <div key={ed} className="text-xs">
+                <div key={ed} className="text-xs text-gray-900 dark:text-white">
                   <div className="flex items-center justify-between">
                     <span>{ed}</span>
-                    <span>
+                    <span className="text-gray-700 dark:text-gray-300">
                       {batchStatus[ed] === 'done'
                         ? (language === 'ar' ? 'اكتمل' : 'Done')
                         : batchStatus[ed] === 'error'
@@ -472,7 +473,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   {batchErrors[ed] && (
-                    <div className="text-red-600">{batchErrors[ed]}</div>
+                    <div className="text-red-600 dark:text-red-400">{batchErrors[ed]}</div>
                   )}
                 </div>
               ))}
@@ -507,7 +508,7 @@ export default function ProfilePage() {
                   </div>
                   <button
                     onClick={() => deleteOffline(b.id)}
-                    className="px-2 py-1 text-xs border rounded"
+                    className="px-2 py-1 text-xs border rounded bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     {language === 'ar' ? 'حذف' : 'Delete'}
                   </button>

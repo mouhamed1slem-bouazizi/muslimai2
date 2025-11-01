@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCalculationMethodName } from '@/lib/prayer-times';
 import toast from 'react-hot-toast';
 import { logger } from '@/lib/logger';
+import { UpdateIcon as Save, ReloadIcon as Loader2 } from '@radix-ui/react-icons';
 
 interface UserPreferencesProps {
   onPreferencesUpdate?: (preferences: any) => void;
