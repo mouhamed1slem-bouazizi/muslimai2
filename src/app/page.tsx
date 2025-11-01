@@ -354,13 +354,9 @@ export default function Home() {
                         : 'bg-white/80 dark:bg-gray-800/80 border-emerald-200 dark:border-gray-700'
                   }`}
                 >
-                  <Icon className={`w-6 h-6 mx-auto mb-2 ${
-                    prayer.isCurrent
-                      ? 'text-green-600 dark:text-green-400'
-                      : prayer.isNext
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-emerald-600'
-                  }`} />
+                  <div className="w-6 h-6 mx-auto mb-2 flex items-center justify-center">
+                    <Icon />
+                  </div>
                   <div className={`text-sm font-medium mb-1 ${
                     prayer.isCurrent
                       ? 'text-green-900 dark:text-green-100'
