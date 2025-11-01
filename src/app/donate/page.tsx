@@ -12,7 +12,7 @@ export default function DonatePage() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pt-20 lg:pt-24">
         <div className={`rounded-2xl p-8 border ${
           theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-emerald-200'
         } backdrop-blur-sm`}

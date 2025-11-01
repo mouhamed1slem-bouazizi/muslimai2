@@ -5,20 +5,6 @@ import { useApp } from '../providers';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import { 
-  Clock, 
-  Calendar, 
-  MapPin, 
-  Sunrise, 
-  Sun, 
-  Sunset, 
-  Moon,
-  RefreshCw,
-  Settings,
-  ChevronRight,
-  Star,
-  X
-} from 'lucide-react';
-import { 
   fetchPrayerTimesByCity, 
   fetchPrayerTimesByCoordinates, 
   getCurrentPrayer, 
@@ -251,7 +237,7 @@ export default function PrayerTimesPage() {
         time: data.fajr,
         isNext: nextPrayer === 'fajr',
         isCurrent: currentPrayer === 'fajr',
-        icon: Sunrise
+        icon: () => <span className="text-2xl">🌅</span>
       },
       {
         name: 'Sunrise',
@@ -259,7 +245,7 @@ export default function PrayerTimesPage() {
         time: data.sunrise,
         isNext: false,
         isCurrent: false,
-        icon: Sun
+        icon: () => <span className="text-2xl">☀️</span>
       },
       {
         name: 'Dhuhr',
@@ -267,7 +253,7 @@ export default function PrayerTimesPage() {
         time: data.dhuhr,
         isNext: nextPrayer === 'dhuhr',
         isCurrent: currentPrayer === 'dhuhr',
-        icon: Sun
+        icon: () => <span className="text-2xl">☀️</span>
       },
       {
         name: 'Asr',
@@ -275,7 +261,7 @@ export default function PrayerTimesPage() {
         time: data.asr,
         isNext: nextPrayer === 'asr',
         isCurrent: currentPrayer === 'asr',
-        icon: Sunset
+        icon: () => <span className="text-2xl">🌇</span>
       },
       {
         name: 'Maghrib',
@@ -283,7 +269,7 @@ export default function PrayerTimesPage() {
         time: data.maghrib,
         isNext: nextPrayer === 'maghrib',
         isCurrent: currentPrayer === 'maghrib',
-        icon: Sunset
+        icon: () => <span className="text-2xl">🌇</span>
       },
       {
         name: 'Isha',
@@ -291,7 +277,7 @@ export default function PrayerTimesPage() {
         time: data.isha,
         isNext: nextPrayer === 'isha',
         isCurrent: currentPrayer === 'isha',
-        icon: Moon
+        icon: () => <span className="text-2xl">🌙</span>
       }
     ];
 
@@ -333,10 +319,10 @@ export default function PrayerTimesPage() {
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Header />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-emerald-600" />
+              <span className="w-8 h-8 animate-spin mx-auto mb-4 text-emerald-600 inline-block">🔄</span>
               <p className="text-gray-600 dark:text-gray-400">
                 {language === 'ar' ? 'جاري تحميل مواقيت الصلاة...' : 'Loading prayer times...'}
               </p>
@@ -351,11 +337,11 @@ export default function PrayerTimesPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Header />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-red-600 dark:text-red-400" />
+                <span className="w-8 h-8 text-red-600 dark:text-red-400 text-2xl">⏰</span>
               </div>
               <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
               <button
@@ -395,7 +381,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -404,7 +390,7 @@ export default function PrayerTimesPage() {
               </h2>
               {fajrContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -442,7 +428,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -451,7 +437,7 @@ export default function PrayerTimesPage() {
               </h2>
               {sunriseContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -489,7 +475,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -498,7 +484,7 @@ export default function PrayerTimesPage() {
               </h2>
               {dhuhrContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -536,7 +522,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -545,7 +531,7 @@ export default function PrayerTimesPage() {
               </h2>
               {asrContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -583,7 +569,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -592,7 +578,7 @@ export default function PrayerTimesPage() {
               </h2>
               {maghribContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -630,7 +616,7 @@ export default function PrayerTimesPage() {
             className="absolute top-4 right-4 z-30 inline-flex items-center justify-center rounded-full p-2 bg-black/50 hover:bg-black/70 text-white transition pointer-events-auto"
             aria-label={language === 'ar' ? 'إغلاق' : 'Close'}
           >
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5 text-white text-lg">✕</span>
           </button>
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
@@ -639,7 +625,7 @@ export default function PrayerTimesPage() {
               </h2>
               {ishaContentLoading ? (
                 <div className="flex items-center justify-center">
-                  <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                  <span className="w-6 h-6 animate-spin text-white inline-block">🔄</span>
                 </div>
               ) : (
                 language === 'ar' ? (
@@ -657,7 +643,7 @@ export default function PrayerTimesPage() {
         </div>
       )}
  
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
         {/* Page Title */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri">
@@ -717,7 +703,7 @@ export default function PrayerTimesPage() {
                   {language === 'ar' ? 'الموقع' : 'Location'}
                 </div>
                 <div className="font-semibold text-gray-800 dark:text-gray-200 flex items-center justify-center gap-1">
-                  <MapPin className="w-4 h-4" />
+                  <span className="w-4 h-4 text-gray-600 dark:text-gray-400 text-sm">📍</span>
                   {prayerData.location.city}, {prayerData.location.country}
                 </div>
               </div>
@@ -877,7 +863,7 @@ export default function PrayerTimesPage() {
               onClick={fetchPrayerTimes}
               className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
             >
-              <RefreshCw className="w-4 h-4" />
+              <span className="w-4 h-4 inline-block">🔄</span>
               {language === 'ar' ? 'تحديث' : 'Refresh'}
             </button>
           </div>

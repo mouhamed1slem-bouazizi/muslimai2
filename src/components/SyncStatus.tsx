@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Wifi, WifiOff, RefreshCw, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/app/providers';
 
@@ -46,9 +45,9 @@ export default function SyncStatus() {
   };
 
   const getStatusIcon = () => {
-    if (!isOnline) return <WifiOff className="w-4 h-4" />;
-    if (pendingUpdates > 0) return <AlertCircle className="w-4 h-4" />;
-    return <Check className="w-4 h-4" />;
+    if (!isOnline) return <span className="w-4 h-4">🚫</span>;
+    if (pendingUpdates > 0) return <span className="w-4 h-4">⚠️</span>;
+    return <span className="w-4 h-4">✓</span>;
   };
 
   return (
@@ -60,9 +59,9 @@ export default function SyncStatus() {
       {/* Connection Status */}
       <div className="flex items-center gap-2">
         {isOnline ? (
-          <Wifi className="w-4 h-4 text-green-500" />
+          <span className="w-4 h-4 text-green-500">📶</span>
         ) : (
-          <WifiOff className="w-4 h-4 text-red-500" />
+          <span className="w-4 h-4 text-red-500">🚫</span>
         )}
         
         <div className={`flex items-center gap-1 ${getStatusColor()}`}>
@@ -84,9 +83,9 @@ export default function SyncStatus() {
           title={language === 'ar' ? 'مزامنة التحديثات المعلقة' : 'Sync pending updates'}
         >
           {isSyncing ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
+            <span className="w-3 h-3 animate-spin">⏳</span>
           ) : (
-            <RefreshCw className="w-3 h-3" />
+            <span className="w-3 h-3">🔄</span>
           )}
           {language === 'ar' ? 'مزامنة' : 'Sync'}
         </button>

@@ -121,3 +121,106 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Apple-inspired glassy theme for mobile */
+@layer components {
+  .glass-header {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    /* iOS Safari optimizations */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .dark .glass-header {
+    background: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+  }
+  
+  .glass-card {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(209, 213, 219, 0.3);
+    /* iOS Safari optimizations */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .dark .glass-card {
+    background: rgba(30, 41, 59, 0.60);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .glass-button {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    /* iOS Safari optimizations */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+  
+  .dark .glass-button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .dark .glass-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .dark .gradient-text {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Mobile-specific responsive improvements */
+  @media (max-width: 768px) {
+    .glass-header {
+      height: 64px; /* Fixed height for mobile */
+      background: rgba(255, 255, 255, 0.85); /* Slightly more opaque on mobile */
+    }
+    
+    .dark .glass-header {
+      background: rgba(17, 25, 40, 0.85);
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.35); /* More visible on mobile */
+    }
+    
+    .dark .glass-card {
+      background: rgba(30, 41, 59, 0.70);
+    }
+  }
+  
+  /* iOS-specific optimizations */
+  @supports (-webkit-touch-callout: none) {
+    .glass-header,
+    .glass-card,
+    .glass-button {
+      /* Enhanced backdrop blur for iOS */
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+    }
+  }
+}

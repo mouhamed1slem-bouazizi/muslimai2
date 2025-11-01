@@ -192,7 +192,7 @@ export default function AdhkarPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" suppressHydrationWarning>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24" suppressHydrationWarning>
           <div className={`rounded-2xl shadow-2xl p-4 md:p-6 border ${calmCard} mt-6`}>
             <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
             <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -205,7 +205,7 @@ export default function AdhkarPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir={textDir} suppressHydrationWarning>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24" dir={textDir} suppressHydrationWarning>
         <h1 className={`text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1 ${isRTL ? 'font-amiri' : ''} text-center`}>{title}</h1>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-4">{subtitle}</p>
         {/* Language is controlled by app settings; no manual toggle */}

@@ -258,7 +258,7 @@ export default function HadithPage() {
           </div>
         </div>
       )}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         <div className="text-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-amiri">{title}{bookName ? ` — ${bookName}` : ''}</h1>
         </div>

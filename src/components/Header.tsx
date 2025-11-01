@@ -4,24 +4,22 @@ import React, { useState, useRef } from 'react';
 import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { 
-  Menu, 
-  X, 
-  Sun, 
-  Moon, 
-  Globe,
-  Clock,
-  Calendar,
-  Compass,
-  BookOpen,
-  ChevronDown,
-  Volume2,
-  MessageCircle,
-  Heart,
-  User,
-  LogOut,
-  Settings
-} from 'lucide-react';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { logger } from '@/lib/logger';
 
 const Header = () => {
@@ -50,22 +48,22 @@ const Header = () => {
 
   const menuItems = [
     { 
-      icon: Clock, 
+      icon: () => <span className="w-5 h-5 text-lg">⏰</span>, 
       label: language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times', 
       href: '/prayer-times' 
     },
     { 
-      icon: Calendar, 
+      icon: () => <span className="w-5 h-5 text-lg">📅</span>, 
       label: language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar', 
       href: '/islamic-calendar' 
     },
     { 
-      icon: Compass, 
+      icon: () => <span className="w-5 h-5 text-lg">🧭</span>, 
       label: language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction', 
       href: '/qibla' 
     },
     { 
-      icon: BookOpen, 
+      icon: () => <span className="w-5 h-5 text-lg">📖</span>, 
       label: language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources', 
       children: [
         { label: language === 'ar' ? 'أسماء الله الحسنى' : 'Asma al Husna', href: '/asma-al-husna' },
@@ -76,12 +74,12 @@ const Header = () => {
       ],
     },
     { 
-      icon: Volume2, 
+      icon: () => <span className="w-5 h-5 text-lg">🔊</span>, 
       label: language === 'ar' ? 'الصوتيات' : 'Audio', 
       href: '/audio' 
     },
     { 
-      icon: MessageCircle, 
+      icon: () => <span className="w-5 h-5 text-lg">💬</span>, 
       label: language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Assistant', 
       href: '/ai-chat' 
     },
@@ -105,236 +103,619 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-emerald-200 dark:border-gray-700 sticky top-0 z-50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse hover:opacity-80 transition-opacity duration-200">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse group">
+            <div className="relative">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-all duration-300 group-hover:scale-105">
+                <span className="w-5 h-5 lg:w-6 lg:h-6 text-white">⏰</span>
+              </div>
+              <div className="absolute -inset-1 bg-gradient-to-br from-emerald-400 to-cyan-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-all duration-300"></div>
             </div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white font-amiri">
-              {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
-            </h1>
+            <div className="hidden sm:block">
+              <h1 className="text-xl lg:text-2xl font-bold gradient-text font-inter">
+                {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
+              </h1>
+              <p className="text-xs text-muted-foreground -mt-1">
+                {language === 'ar' ? 'تطبيق إسلامي شامل' : 'Islamic Companion'}
+              </p>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              if ((item as any).children) {
-                const children = (item as any).children as Array<{ label: string; href: string }>;
-                return (
-                  <div
-                    key="resources"
-                    className="relative"
-                    onMouseEnter={openResources}
-                    onMouseLeave={scheduleCloseResources}
-                    onFocus={openResources}
-                    onBlur={scheduleCloseResources}
-                  >
-                    <button
-                      type="button"
-                      className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200 cursor-pointer"
-                      aria-haspopup="menu"
-                      aria-expanded={resourcesOpen}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <ChevronDown className={`w-4 h-4 transition-transform ${resourcesOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    <div
-                      className={`absolute top-full mt-0 ${language === 'ar' ? 'right-0' : 'left-0'} ${resourcesOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] z-50`}
-                      onMouseEnter={openResources}
-                      onMouseLeave={scheduleCloseResources}
-                      onFocus={openResources}
-                      onBlur={scheduleCloseResources}
-                    >
-                      <div className="py-2">
-                        {children.map((child) => (
+          <div className="hidden lg:flex items-center space-x-1">
+            <NavigationMenu>
+              <NavigationMenuList className="space-x-1">
+                <NavigationMenuItem>
+                  <Link href="/prayer-times" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50">
+                      <span className="w-4 h-4 mr-2">⏰</span>
+                      {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/islamic-calendar" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                      <span className="w-4 h-4 mr-2">📅</span>
+                      {language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/qibla" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                      <span className="w-4 h-4 mr-2">🧭</span>
+                      {language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction'}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                    <span className="w-4 h-4 mr-2">📚</span>
+                    {language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources'}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid gap-3 p-6 w-[400px] lg:w-[500px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl">
+                      <div className="row-span-3">
+                        <NavigationMenuLink asChild>
                           <Link
-                            key={child.href}
-                            href={child.href}
-                            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            onClick={() => setResourcesOpen(false)}
+                            className="flex h-full w-full select-none flex-col justify-end rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-600/10 p-6 no-underline outline-none focus:shadow-md hover:bg-gradient-to-br hover:from-emerald-500/20 hover:to-teal-600/20 transition-all duration-200"
+                            href="/asma-al-husna"
                           >
-                            {child.label}
+                            <span className="h-6 w-6 text-emerald-600 dark:text-emerald-400">📚</span>
+                            <div className="mb-2 mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'أسماء الله الحسنى' : 'Asma al Husna'}
+                            </div>
+                            <p className="text-sm leading-tight text-gray-600 dark:text-gray-400">
+                              {language === 'ar' ? 'الأسماء الحسنى لله تعالى' : 'The beautiful names of Allah'}
+                            </p>
                           </Link>
-                        ))}
+                        </NavigationMenuLink>
+                      </div>
+                      <div className="grid gap-2">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-800/80 focus:bg-gray-100 focus:text-gray-900"
+                            href="/quran"
+                          >
+                            <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'القرآن' : 'Quran'}
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
+                              {language === 'ar' ? 'اقرأ واستمع للقرآن الكريم' : 'Read and listen to the Holy Quran'}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-800/80 focus:bg-gray-100 focus:text-gray-900"
+                            href="/tafsir"
+                          >
+                            <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'التفسير' : 'Tafsir'}
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
+                              {language === 'ar' ? 'تفسير القرآن الكريم' : 'Quran interpretation'}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-800/80 focus:bg-gray-100 focus:text-gray-900"
+                            href="/hadith"
+                          >
+                            <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'الحديث' : 'Hadith'}
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
+                              {language === 'ar' ? 'أحاديث نبوية شريفة' : 'Prophetic traditions'}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100/80 dark:hover:bg-gray-800/80 focus:bg-gray-100 focus:text-gray-900"
+                            href="/adhkar"
+                          >
+                            <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'الأذكار' : 'Adhkar'}
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
+                              {language === 'ar' ? 'أذكار الصباح والمساء' : 'Morning and evening remembrance'}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
                       </div>
                     </div>
-                  </div>
-                );
-              }
-              return (
-                <Link
-                  key={(item as any).href}
-                  href={(item as any).href}
-                  className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200"
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-            {/* Donate Link (after AI Assistant) */}
-            <Link
-              href="/donate"
-              className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200"
-            >
-              <Heart className="w-4 h-4" />
-              <span className="text-sm font-medium">{language === 'ar' ? 'تبرع' : 'Donate'}</span>
-            </Link>
-          </nav>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/audio" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                      <span className="w-4 h-4 mr-2">🔊</span>
+                      {language === 'ar' ? 'الصوتيات' : 'Audio'}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/ai-chat" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                      <span className="w-4 h-4 mr-2">💬</span>
+                      {language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Assistant'}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/donate" legacyBehavior passHref>
+                    <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
+                        <span className="w-4 h-4 mr-2">❤️</span>
+                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
+                      </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
           {/* Controls */}
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+          <div className="flex items-center space-x-2 lg:space-x-3">
             {/* Theme Toggle */}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-              aria-label="Toggle theme"
+              className="h-10 w-10 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105"
             >
-              {theme === 'light' ? (
-                <Moon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              {theme === 'dark' ? (
+                <span className="h-4 w-4">☀️</span>
               ) : (
-                <Sun className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <span className="h-4 w-4">🌙</span>
               )}
-            </button>
+            </Button>
 
             {/* Language Toggle */}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={toggleLanguage}
-              className="flex items-center space-x-1 rtl:space-x-reverse p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-              aria-label="Toggle language"
+              className="hidden sm:flex h-10 px-3 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105 items-center space-x-2"
             >
-              <Globe className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <span className="h-4 w-4 text-gray-700 dark:text-gray-300 text-sm">🌐</span>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {language === 'ar' ? 'EN' : 'عر'}
+                {language === 'ar' ? 'EN' : 'عربي'}
               </span>
-            </button>
+            </Button>
 
             {/* User Menu */}
             {user ? (
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <Link
-                  href="/profile"
-                  className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-                >
-                  {user.photoURL ? (
-                    <img 
-                      src={user.photoURL} 
-                      alt="Profile" 
-                      className="w-6 h-6 rounded-full"
-                    />
-                  ) : (
-                    <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                  )}
-                  <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {user.displayName || 'Profile'}
+              <div className="hidden lg:flex items-center space-x-3">
+                <Link href="/profile" className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 hover:scale-105 cursor-pointer">
+                  <span className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span className="text-lg">👤</span>
+                  </span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {user.email?.split('@')[0]}
                   </span>
                 </Link>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleLogout}
-                  className="p-2 rounded-lg bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors duration-200"
-                  title={language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                  className="h-10 px-3 rounded-xl bg-red-100/80 dark:bg-red-900/20 hover:bg-red-200/80 dark:hover:bg-red-900/40 border-0 transition-all duration-200 hover:scale-105 text-red-600 dark:text-red-400"
                 >
-                  <LogOut className="w-5 h-5 text-red-600 dark:text-red-400" />
-                </button>
+                  <span className="h-4 w-4 mr-2">🚪</span>
+                  {language === 'ar' ? 'خروج' : 'Logout'}
+                </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <Link
-                  href="/auth/login"
-                  className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors duration-200"
+              <div className="hidden lg:flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="h-10 px-4 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105"
                 >
-                  {language === 'ar' ? 'دخول' : 'Login'}
-                </Link>
-                <Link
-                  href="/auth/signup"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                  <Link href="/auth/login">
+                    <span className="h-4 w-4 mr-2">👤</span>
+                    {language === 'ar' ? 'دخول' : 'Login'}
+                  </Link>
+                </Button>
+                <Button
+                  size="sm"
+                  asChild
+                  className="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 transition-all duration-200 hover:scale-105 shadow-lg shadow-emerald-500/25"
                 >
-                  {language === 'ar' ? 'تسجيل' : 'Sign Up'}
-                </Link>
+                  <Link href="/auth/signup">
+                    {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
+                  </Link>
+                </Button>
               </div>
             )}
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-              ) : (
-                <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-              )}
-            </button>
+            {/* Mobile Menu */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="lg:hidden h-10 w-10 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105 active:scale-95"
+                >
+                  <span className="h-5 w-5 text-gray-700 dark:text-white">☰</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="right" 
+                className="w-full sm:w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 p-0 transition-colors duration-300"
+              >
+                <div className="flex flex-col h-full">
+                  <SheetHeader className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <SheetTitle className="text-left text-xl font-bold text-gray-900 dark:text-gray-100">
+                      {language === 'ar' ? 'القائمة' : 'Menu'}
+                    </SheetTitle>
+                  </SheetHeader>
+                  
+                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {/* User Section */}
+                    {user ? (
+                      <Link href="/profile" className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer">
+                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center">
+                          <span className="text-2xl">👤</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {user.email?.split('@')[0]}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'مستخدم مسجل' : 'Registered User'}
+                          </p>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button
+                          asChild
+                          className="w-full h-12 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0 transition-all duration-200 shadow-lg shadow-emerald-500/25"
+                        >
+                          <Link href="/auth/signup">
+                            <span className="w-5 h-5 mr-2">👤</span>
+                            {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          asChild
+                          className="w-full h-12 rounded-2xl bg-transparent border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition-all duration-200"
+                        >
+                          <Link href="/auth/login">
+                            {language === 'ar' ? 'دخول' : 'Login'}
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Navigation Links */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">
+                        {language === 'ar' ? 'التنقل' : 'Navigation'}
+                      </h3>
+                      
+                      <Link
+                        href="/prayer-times"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">⏰</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'أوقات الصلاة اليومية' : 'Daily prayer schedule'}
+                          </p>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/islamic-calendar"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">📅</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'التواريخ الهجرية' : 'Hijri dates'}
+                          </p>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/qibla"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">🧭</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'اتجاه الكعبة المشرفة' : 'Direction to Kaaba'}
+                          </p>
+                        </div>
+                      </Link>
+
+                      {/* Quran & Resources Dropdown */}
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => setMobileDropdownOpen(!mobileDropdownOpen)}
+                          className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                              <span className="text-xl">📚</span>
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium text-gray-900 dark:text-white">
+                                {language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources'}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {language === 'ar' ? 'الموارد الإسلامية' : 'Islamic resources'}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`w-5 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 transition-transform duration-200 ${mobileDropdownOpen ? 'rotate-180' : ''}`}>▼</span>
+                        </button>
+                        
+                        {mobileDropdownOpen && (
+                          <div className="ml-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                            <Link
+                              href="/asma-al-husna"
+                              className="flex items-center space-x-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+                            >
+                              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white text-sm">📖</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {language === 'ar' ? 'أسماء الله الحسنى' : 'Asma al Husna'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {language === 'ar' ? 'الأسماء الحسنى' : 'Beautiful names'}
+                                </p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/quran"
+                              className="flex items-center space-x-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+                            >
+                              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                                <span className="text-base">📖</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {language === 'ar' ? 'القرآن الكريم' : 'Quran'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {language === 'ar' ? 'القراءة والاستماع' : 'Read and listen'}
+                                </p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/tafsir"
+                              className="flex items-center space-x-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+                            >
+                              <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg flex items-center justify-center">
+                                <span className="text-base">📜</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {language === 'ar' ? 'التفسير' : 'Tafsir'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {language === 'ar' ? 'تفسير القرآن' : 'Quran interpretation'}
+                                </p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/hadith"
+                              className="flex items-center space-x-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+                            >
+                              <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center">
+                                <span className="text-base">🗣️</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {language === 'ar' ? 'الحديث الشريف' : 'Hadith'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {language === 'ar' ? 'أحاديث نبوية' : 'Prophetic traditions'}
+                                </p>
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="/adhkar"
+                              className="flex items-center space-x-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+                            >
+                              <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center">
+                                <span className="text-base">📿</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                                  {language === 'ar' ? 'الأذكار' : 'Adhkar'}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {language === 'ar' ? 'أذكار يومية' : 'Daily remembrance'}
+                                </p>
+                              </div>
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+
+                      <Link
+                        href="/audio"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100/80 dark:bg-gray-800/30 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">🔊</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'الصوتيات' : 'Audio'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'تسجيلات صوتية' : 'Audio recordings'}
+                          </p>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/ai-chat"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-100/80 dark:bg-gray-800/30 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">💬</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'المساعد الذكي' : 'AI Assistant'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'اسأل أي سؤال إسلامي' : 'Ask Islamic questions'}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+
+                    {/* Settings */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">
+                        {language === 'ar' ? 'الإعدادات' : 'Settings'}
+                      </h3>
+                      
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-100/80 dark:bg-gray-800/40">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+                            {theme === 'dark' ? (
+                              <span className="text-xl">☀️</span>
+                            ) : (
+                              <span className="text-xl">🌙</span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'المظهر' : 'Theme'}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {theme === 'dark' 
+                                ? (language === 'ar' ? 'مظلم' : 'Dark') 
+                                : (language === 'ar' ? 'فاتح' : 'Light')
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={toggleTheme}
+                          className="h-10 w-10 rounded-xl bg-gray-200 dark:bg-gray-700 border-0 text-gray-700 dark:text-gray-300"
+                        >
+                          {theme === 'dark' ? (
+                            <span className="h-4 w-4 text-sm">☀️</span>
+                          ) : (
+                            <span className="h-4 w-4 text-sm">🌙</span>
+                          )}
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-100/80 dark:bg-gray-800/40">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center">
+                            <span className="text-xl">🌍</span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {language === 'ar' ? 'اللغة' : 'Language'}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {language === 'ar' ? 'العربية' : 'English'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={toggleLanguage}
+                          className="h-10 px-3 rounded-xl bg-gray-200 dark:bg-gray-700 border-0 text-gray-700 dark:text-gray-300"
+                        >
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {language === 'ar' ? 'EN' : 'عربي'}
+                          </span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Support */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">
+                        {language === 'ar' ? 'الدعم' : 'Support'}
+                      </h3>
+                      
+                      <Link
+                        href="/donate"
+                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gradient-to-br from-pink-500/10 to-red-600/10 border border-pink-200/20 dark:border-pink-800/20 hover:from-pink-500/20 hover:to-red-600/20 transition-all duration-200 group"
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                          <span className="text-xl">❤️</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'تبرع' : 'Donate'}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {language === 'ar' ? 'ادعم التطبيق' : 'Support the app'}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+
+                    {user && (
+                      <div className="pt-4 border-t border-gray-200/20 dark:border-gray-800/20">
+                        <Button
+                          variant="ghost"
+                          onClick={handleLogout}
+                          className="w-full h-12 rounded-2xl bg-red-100/80 dark:bg-red-900/20 hover:bg-red-200/80 dark:hover:bg-red-900/40 border-0 transition-all duration-200 text-red-600 dark:text-red-400"
+                        >
+                          <span className="w-5 h-5 mr-2">🚪</span>
+                          {language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
-            <nav className="flex flex-col space-y-3">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                if ((item as any).children) {
-                  const children = (item as any).children as Array<{ label: string; href: string }>;
-                  return (
-                    <div key="resources" className="p-2">
-                      <button
-                        onClick={() => setMobileDropdownOpen((v) => !v)}
-                        className="flex w-full items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                      >
-                        <span className="flex items-center space-x-3 rtl:space-x-reverse">
-                          <Icon className="w-5 h-5" />
-                          <span className="font-medium">{item.label}</span>
-                        </span>
-                        <ChevronDown className={`w-5 h-5 transition-transform ${mobileDropdownOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      {mobileDropdownOpen && (
-                        <div className="mt-2 pl-8 space-y-2">
-                          {children.map((child) => (
-                            <Link
-                              key={child.href}
-                              href={child.href}
-                              className="block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              {child.label}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-                return (
-                  <Link
-                    key={(item as any).href}
-                    href={(item as any).href}
-                    className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors duration-200"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                );
-              })}
-              {/* Donate Link (after AI Assistant) */}
-              <Link
-                href="/donate"
-                className="flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Heart className="w-5 h-5" />
-                <span className="font-medium">{language === 'ar' ? 'تبرع' : 'Donate'}</span>
-              </Link>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );

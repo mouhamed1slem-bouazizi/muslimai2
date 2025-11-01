@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Header from '@/components/Header';
 import { useApp } from '../providers';
-import { ChevronLeft, ChevronRight, Loader2, Info } from 'lucide-react';
 import { fetchQuran, getMetadata, type LanguageCode, type Ayah } from '@/lib/quran-api';
 import { fetchTafsir, type TafsirVerse } from '@/lib/tafsir-api';
 
@@ -94,7 +93,7 @@ export default function TafsirPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Title */}
         <div className="text-center mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri">{title}</h1>
@@ -122,7 +121,7 @@ export default function TafsirPage() {
               disabled={currentSura <= 1}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <span className="w-5 h-5 text-lg">◀️</span>
               {lang === 'ar' ? 'السورة السابقة' : 'Previous Surah'}
             </button>
             <button
@@ -131,7 +130,7 @@ export default function TafsirPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {lang === 'ar' ? 'السورة التالية' : 'Next Surah'}
-              <ChevronRight className="w-5 h-5" />
+              <span className="w-5 h-5 text-lg">▶️</span>
             </button>
           </div>
         </div>
@@ -143,7 +142,7 @@ export default function TafsirPage() {
             if (!suraMeta) return null;
             return (
               <div className={`mb-4 mx-auto max-w-2xl rounded-xl border ${calmCard} px-4 py-3 text-sm text-gray-700 dark:text-gray-300 flex items-center gap-3 justify-center`}>
-                <Info className="w-4 h-4 text-emerald-600" />
+                <span className="w-4 h-4 text-emerald-600 text-lg">ℹ️</span>
                 <span className="font-medium">
                   {lang === 'ar' ? `${suraMeta.number}. ${suraMeta.nameAr}` : `${suraMeta.number}. ${suraMeta.nameEn}`}
                 </span>
@@ -157,7 +156,7 @@ export default function TafsirPage() {
         <div className={`rounded-2xl shadow-2xl p-6 border ${calmCard}`}>
           {loading ? (
             <div className="flex items-center justify-center py:12 md:py-16">
-              <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+              <span className="w-6 h-6 animate-spin text-emerald-600 text-xl inline-block">🔄</span>
             </div>
           ) : error ? (
             <div className="text-center text-red-600 dark:text-red-400">{lang === 'ar' ? 'حدث خطأ أثناء التحميل' : 'An error occurred while loading'}</div>

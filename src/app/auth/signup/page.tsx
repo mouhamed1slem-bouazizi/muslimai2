@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/app/providers';
 import toast from 'react-hot-toast';
@@ -93,7 +93,7 @@ export default function SignupPage() {
               theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
             } transition-colors`}
           >
-            <ArrowLeft className="w-4 h-4" />
+                        <span className="w-4 h-4">⬅️</span>
             {language === 'ar' ? 'العودة للرئيسية' : 'Back to Home'}
           </Link>
           
@@ -123,9 +123,7 @@ export default function SignupPage() {
               {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
             </label>
             <div className="relative">
-              <User className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-              }`} />
+                            <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${'text-gray-400'}`}>👤</span>
               <input
                 {...register('name')}
                 type="text"
@@ -153,9 +151,7 @@ export default function SignupPage() {
               {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
             </label>
             <div className="relative">
-              <Mail className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-              }`} />
+                            <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${'text-gray-400'}`}>✉️</span>
               <input
                 {...register('email')}
                 type="email"
@@ -183,9 +179,7 @@ export default function SignupPage() {
               {language === 'ar' ? 'كلمة المرور' : 'Password'}
             </label>
             <div className="relative">
-              <Lock className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-              }`} />
+                            <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${'text-gray-400'}`}>🔒</span>
               <input
                 {...register('password')}
                 type={showPassword ? 'text' : 'password'}
@@ -206,7 +200,7 @@ export default function SignupPage() {
                   theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                 } transition-colors`}
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showPassword ? <span className="w-5 h-5">👁️‍🗨️</span> : <span className="w-5 h-5">👁️</span>}
               </button>
             </div>
             {errors.password && (
@@ -245,7 +239,7 @@ export default function SignupPage() {
                   theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
                 } transition-colors`}
               >
-                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                {showConfirmPassword ? <span className="w-5 h-5">👁️‍🗨️</span> : <span className="w-5 h-5">👁️</span>}
               </button>
             </div>
             {errors.confirmPassword && (

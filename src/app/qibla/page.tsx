@@ -271,7 +271,7 @@ export default function QiblaPage() {
     <div className="min-h-screen">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         <div className="mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-amiri">{titleText}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitleText}</p>

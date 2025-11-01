@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/app/providers';
-import { Sparkles, Clock, Share2, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
 type FeaturedPayload = {
@@ -190,7 +189,7 @@ export default function IslamicStoryCard() {
   return (
     <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 mb-8">
       <div className="flex items-center justify-center mb-4">
-        <Sparkles className="w-8 h-8 text-emerald-600" />
+        <span className="w-8 h-8 text-emerald-600">✨</span>
       </div>
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center font-amiri">
         {lang === 'ar' ? 'قصة إسلامية اليوم' : 'Today’s Islamic Story'}
@@ -205,7 +204,7 @@ export default function IslamicStoryCard() {
           <div className="text-center mb-4">
             <div className="text-xl font-extrabold text-emerald-700 dark:text-emerald-300 font-amiri">{title}</div>
             <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-              <Clock className="w-4 h-4" />
+              <span className="w-4 h-4">⏰</span>
               <span>
                 {lang === 'ar' ? 'التبديل بعد:' : 'Next rotation in:'} {countdown}
               </span>
@@ -228,13 +227,13 @@ export default function IslamicStoryCard() {
           {/* Actions */}
           <div className="mt-6 flex items-center justify-center gap-3">
             <button onClick={handleShare} className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
-              <Share2 className="w-4 h-4" />
+              <span className="w-4 h-4">🔗</span>
               {lang === 'ar' ? 'مشاركة' : 'Share'}
             </button>
             <button onClick={() => setShowHistory(v => !v)} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
-              <History className="w-4 h-4" />
+              <span className="w-4 h-4">📜</span>
               {lang === 'ar' ? 'سجل القصص' : 'Story History'}
-              {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {showHistory ? <span className="w-4 h-4">🔼</span> : <span className="w-4 h-4">🔽</span>}
             </button>
           </div>
 

@@ -3,21 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from './providers';
 import Header from '@/components/Header';
-import { 
-  Clock, 
-  Calendar, 
-  Compass, 
-  BookOpen, 
-  Volume2, 
-  MessageCircle,
-  MapPin,
-  Star,
-  Heart,
-  Sunrise,
-  Sun,
-  Sunset,
-  Moon
-} from 'lucide-react';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   fetchPrayerTimesByCity, 
@@ -230,37 +216,37 @@ export default function Home() {
 
   const features = [
     {
-      icon: Clock,
+      icon: () => <span className="text-2xl text-white">⏰</span>,
       title: language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times',
       description: language === 'ar' ? 'مواقيت دقيقة للصلوات الخمس' : 'Accurate prayer times for all five prayers',
       href: '/prayer-times'
     },
     {
-      icon: Calendar,
+      icon: () => <span className="text-2xl text-white">📅</span>,
       title: language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar',
       description: language === 'ar' ? 'التقويم الهجري وتقويم رمضان' : 'Hijri calendar and Ramadan calendar',
       href: '/islamic-calendar'
     },
     {
-      icon: Compass,
+      icon: () => <span className="text-2xl text-white">🧭</span>,
       title: language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction',
       description: language === 'ar' ? 'البوصلة واتجاه القبلة' : 'Compass and Qibla direction',
       href: '/qibla'
     },
     {
-      icon: BookOpen,
+      icon: () => <span className="text-2xl text-white">📚</span>,
       title: language === 'ar' ? 'القرآن والموارد' : 'Quran & Resources',
       description: language === 'ar' ? 'القرآن والتفسير والأحاديث والأذكار' : 'Quran, Tafsir, Hadith, and Adhkar',
       href: '/quran'
     },
     {
-      icon: Volume2,
+      icon: () => <span className="text-2xl text-white">🔊</span>,
       title: language === 'ar' ? 'الصوتيات' : 'Audio',
       description: language === 'ar' ? '18 قارئ وإذاعات القرآن' : '18 reciters and Quran radio',
       href: '/audio'
     },
     {
-      icon: MessageCircle,
+      icon: () => <span className="text-2xl text-white">💬</span>,
       title: language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Assistant',
       description: language === 'ar' ? 'مساعد ذكي للأسئلة الإسلامية' : 'AI assistant for Islamic questions',
       href: '/ai-chat'
@@ -271,7 +257,7 @@ export default function Home() {
     <div className="min-h-screen">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {showDonatePopup && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40" onClick={() => dismissDonatePopup(true)} />
@@ -321,7 +307,7 @@ export default function Home() {
           {/* Current Time */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 mb-8 max-w-md mx-auto border border-emerald-200 dark:border-gray-700">
             <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse mb-2">
-              <MapPin className="w-5 h-5 text-emerald-600" />
+              <span className="text-xl">📍</span>
               <span className="text-gray-600 dark:text-gray-400">
                 {language === 'ar' ? 'الوقت الحالي' : 'Current Time'}
               </span>
@@ -348,13 +334,13 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {prayerTimes.map((prayer, index) => {
               const getPrayerIcon = (name: string) => {
-                if (name.includes('Fajr') || name.includes('الفجر')) return Sunrise;
-                if (name.includes('Sunrise') || name.includes('الشروق')) return Sun;
-                if (name.includes('Dhuhr') || name.includes('الظهر')) return Sun;
-                if (name.includes('Asr') || name.includes('العصر')) return Sunset;
-                if (name.includes('Maghrib') || name.includes('المغرب')) return Sunset;
-                if (name.includes('Isha') || name.includes('العشاء')) return Moon;
-                return Clock;
+                if (name.includes('Fajr') || name.includes('الفجر')) return () => <span className="text-xl">🌅</span>;
+                if (name.includes('Sunrise') || name.includes('الشروق')) return () => <span className="text-xl">☀️</span>;
+                if (name.includes('Dhuhr') || name.includes('الظهر')) return () => <span className="text-xl">☀️</span>;
+                if (name.includes('Asr') || name.includes('العصر')) return () => <span className="text-xl">🌇</span>;
+                if (name.includes('Maghrib') || name.includes('المغرب')) return () => <span className="text-xl">🌇</span>;
+                if (name.includes('Isha') || name.includes('العشاء')) return () => <span className="text-xl">🌙</span>;
+                return () => <span className="text-xl">⏰</span>;
               };
               const Icon = getPrayerIcon(prayer.name);
               return (
@@ -412,7 +398,7 @@ export default function Home() {
           {(location || userProfile?.city) && (
             <div className="mt-6 text-center">
               <div className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-200 dark:border-gray-700">
-                <MapPin className="w-4 h-4" />
+                <span className="text-base">📍</span>
                 <span>
                   {userProfile?.city && userProfile?.country 
                     ? `${userProfile.city}, ${userProfile.country}`
@@ -458,9 +444,9 @@ export default function Home() {
         {/* Islamic Quote */}
         <div className="text-center bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white">
           <div className="flex items-center justify-center mb-4">
-            <Heart className="w-6 h-6 text-white/80 mx-2" />
-            <Star className="w-8 h-8 text-white" />
-            <Heart className="w-6 h-6 text-white/80 mx-2" />
+            <span className="w-6 h-6 mx-2">❤️</span>
+            <span className="text-4xl">⭐</span>
+                            <span className="w-6 h-6">❤️</span>
           </div>
           <blockquote className="text-xl md:text-2xl font-amiri mb-4">
             {language === 'ar' 

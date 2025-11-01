@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Laptop } from "lucide-react";
 import { useApp } from "@/app/providers";
 
 export function ThemeToggle() {
@@ -20,7 +19,9 @@ export function ThemeToggle() {
   if (!mounted) return null;
 
   const applySystemTheme = () => {
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
     setTheme(prefersDark ? "dark" : "light");
   };
 
@@ -28,23 +29,19 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" aria-label="Toggle theme">
-          {theme === "dark" ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
+          {theme === "dark" ? "🌙" : "☀️"}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}> 
-          <Sun className="mr-2 h-4 w-4" /> Light
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          ☀️ Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}> 
-          <Moon className="mr-2 h-4 w-4" /> Dark
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          🌙 Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={applySystemTheme}> 
-          <Laptop className="mr-2 h-4 w-4" /> System
+        <DropdownMenuItem onClick={applySystemTheme}>
+          💻 System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

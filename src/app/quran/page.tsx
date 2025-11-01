@@ -13,7 +13,7 @@ import {
   type QuranData,
   type QuranIndexes,
 } from "@/lib/quran-api";
-import { ChevronLeft, ChevronRight, Loader2, Bookmark, Filter, Info, Play, Pause } from "lucide-react";
+
 
 const LS_LAST_PAGE = (lang: LanguageCode) => `quran_last_page_${lang}`;
 const TOTAL_PAGES = 604;
@@ -208,7 +208,7 @@ export default function QuranPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-amiri">{heading}</h1>
@@ -325,7 +325,7 @@ export default function QuranPage() {
         <div className={`rounded-2xl shadow-2xl border ${calmCard}`}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-emerald-600" />
+              <span className="text-xl text-emerald-600">🔍</span>
               <span className="text-sm text-gray-700 dark:text-gray-300">{lang === 'ar' ? 'عرض الصفحة' : 'Page View'}</span>
             </div>
             <div className="flex items-center gap-3">
@@ -338,7 +338,7 @@ export default function QuranPage() {
                   }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm"
                 >
-                  <Bookmark className="w-4 h-4" />
+                  <span className="text-xl">🔖</span>
                   {lang === 'ar' ? 'متابعة القراءة' : 'Resume Reading'}
                 </button>
               )}
@@ -349,8 +349,9 @@ export default function QuranPage() {
           {/* Page content */}
           <div className="px-6 py-6">
             {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+              <div className="flex flex-col items-center justify-center py-12 text-lg font-medium text-gray-500 dark:text-gray-400">
+                <span className="text-4xl animate-spin">⏳</span>
+                <p className="mt-2">{lang === "ar" ? "جاري التحميل..." : "Loading..."}</p>
               </div>
             ) : error ? (
               <div className="text-center text-red-600 dark:text-red-400">{error}</div>
@@ -370,7 +371,7 @@ export default function QuranPage() {
                           onClick={() => setInfoOpenSurah(infoOpenSurah === group.surahNumber ? null : group.surahNumber)}
                           className="flex items-center gap-1 text-sm text-gray-300 hover:text-white"
                         >
-                          <Info className="w-4 h-4" /> {lang === 'ar' ? 'معلومات السورة' : 'Surah Info'}
+                          <span className="text-xl">ℹ️</span> {lang === 'ar' ? 'معلومات السورة' : 'Surah Info'}
                         </button>
                       </div>
                       <div className="text-center flex-1">
@@ -386,7 +387,7 @@ export default function QuranPage() {
                             window.location.href = '/audio';
                           }}
                         >
-                          <Play className="w-4 h-4" /> {lang === 'ar' ? 'تشغيل الصوت' : 'Play Audio'}
+                          <span className="text-xl">▶️</span> {lang === 'ar' ? 'تشغيل الصوت' : 'Play Audio'}
                         </button>
                       </div>
                     </div>
@@ -445,7 +446,7 @@ export default function QuranPage() {
               disabled={currentPage <= 1}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <span className="text-xl">⬅️</span>
               {lang === 'ar' ? 'الصفحة السابقة' : 'Previous Page'}
             </button>
             <button
@@ -454,7 +455,7 @@ export default function QuranPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {lang === 'ar' ? 'الصفحة التالية' : 'Next Page'}
-              <ChevronRight className="w-5 h-5" />
+              <span className="text-xl">➡️</span>
             </button>
           </div>
         </div>

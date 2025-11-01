@@ -7,16 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { 
-  User, 
-  Mail, 
-  MapPin, 
-  Globe, 
-  Navigation, 
-  Save, 
-  LogOut, 
-  Loader2 
-} from 'lucide-react';
 import Header from '@/components/Header';
 import UserPreferences from '@/components/UserPreferences';
 import { logger } from '@/lib/logger';
@@ -195,7 +185,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
+        <span className="w-8 h-8 animate-spin inline-block text-2xl">🔄</span>
       </div>
     );
   }
@@ -204,7 +194,7 @@ export default function ProfilePage() {
     <div className="min-h-screen">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri">
@@ -233,9 +223,9 @@ export default function ProfilePage() {
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
-                <User className={`w-10 h-10 ${
+                <span className={`w-10 h-10 text-3xl flex items-center justify-center ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                }`} />
+                }`}>👤</span>
               )}
             </div>
             <div>
@@ -262,9 +252,9 @@ export default function ProfilePage() {
                 {language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
               </label>
               <div className="relative">
-                <User className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 text-lg flex items-center justify-center ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                }`} />
+                }`}>👤</span>
                 <input
                   {...register('name')}
                   type="text"
@@ -292,9 +282,9 @@ export default function ProfilePage() {
                 {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
               </label>
               <div className="relative">
-                <Mail className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 text-lg flex items-center justify-center ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                }`} />
+                }`}>📧</span>
                 <input
                   {...register('email')}
                   type="email"
@@ -324,9 +314,9 @@ export default function ProfilePage() {
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {isGettingLocation ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="w-4 h-4 animate-spin inline-block text-sm">🔄</span>
                   ) : (
-                    <Navigation className="w-4 h-4" />
+                    <span className="w-4 h-4 text-sm">🧭</span>
                   )}
                   {language === 'ar' ? 'تحديد الموقع' : 'Get Location'}
                 </button>
@@ -340,9 +330,9 @@ export default function ProfilePage() {
                   {language === 'ar' ? 'المدينة' : 'City'}
                 </label>
                 <div className="relative">
-                  <MapPin className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 text-lg flex items-center justify-center ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>📍</span>
                   <input
                     {...register('city')}
                     type="text"
@@ -370,9 +360,9 @@ export default function ProfilePage() {
                   {language === 'ar' ? 'البلد' : 'Country'}
                 </label>
                 <div className="relative">
-                  <Globe className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <span className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 text-lg flex items-center justify-center ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>🌐</span>
                   <input
                     {...register('country')}
                     type="text"
@@ -400,9 +390,9 @@ export default function ProfilePage() {
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="w-5 h-5 animate-spin inline-block text-lg">🔄</span>
               ) : (
-                <Save className="w-5 h-5" />
+                <span className="w-5 h-5 text-lg">💾</span>
               )}
               {isLoading 
                 ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') 
@@ -532,7 +522,7 @@ export default function ProfilePage() {
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-lg border border-red-500 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-600/10 font-semibold transition-all"
         >
-          <LogOut className="w-5 h-5" />
+          <span className="w-5 h-5 text-lg">🚪</span>
           {language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
         </button>
       </main>

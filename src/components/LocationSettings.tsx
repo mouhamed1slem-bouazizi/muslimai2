@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation, Search, Loader2, Check, X } from 'lucide-react';
 import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCurrentPosition, reverseGeocode, getCompleteLocation } from '@/lib/location';
@@ -128,7 +127,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
         : 'bg-white/80 backdrop-blur-lg border border-white/20'
     } rounded-2xl shadow-2xl p-6`}>
       <div className="flex items-center gap-3 mb-6">
-        <MapPin className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+        <span className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>📍</span>
         <h2 className={`text-xl font-semibold ${
           theme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
@@ -142,7 +141,7 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
           theme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-50'
         }`}>
           <div className="flex items-center gap-2 mb-2">
-            <Check className={`w-4 h-4 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
+            <span className={`w-4 h-4 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>✓</span>
             <span className={`text-sm font-medium ${
               theme === 'dark' ? 'text-green-400' : 'text-green-600'
             }`}>
@@ -177,9 +176,9 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
           } disabled:cursor-not-allowed`}
         >
           {isDetecting ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="w-5 h-5 animate-spin">⏳</span>
           ) : (
-            <Navigation className="w-5 h-5" />
+            <span className="w-5 h-5">🛰️</span>
           )}
           {isDetecting 
             ? (language === 'ar' ? 'جاري تحديد الموقع...' : 'Detecting Location...')
@@ -198,9 +197,9 @@ export default function LocationSettings({ onLocationUpdate }: LocationSettingsP
             } disabled:cursor-not-allowed`}
           >
             {isUpdating ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="w-4 h-4 animate-spin">⏳</span>
             ) : (
-              <Check className="w-4 h-4" />
+              <span className="w-4 h-4">✓</span>
             )}
             {language === 'ar' ? 'حفظ الموقع المحدد' : 'Save Detected Location'}
           </button>

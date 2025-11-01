@@ -4,21 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../providers';
 import Header from '@/components/Header';
 import IslamicStoryCard from '@/components/IslamicStoryCard';
-import { 
-  Calendar, 
-  Clock, 
-  Star, 
-  Moon, 
-  Sun, 
-  ChevronLeft, 
-  ChevronRight,
-  CalendarDays,
-  Gift,
-  MapPin,
-  Sparkles,
-  ArrowLeftRight,
-  RefreshCw
-} from 'lucide-react';
 import {
   getCurrentIslamicYear,
   getCurrentIslamicMonth,
@@ -328,10 +313,10 @@ export default function IslamicCalendar() {
     return (
       <div className="min-h-screen">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <RefreshCw className="w-12 h-12 text-emerald-600 animate-spin mx-auto mb-4" />
+              <span className="w-12 h-12 text-emerald-600 animate-spin mx-auto mb-4 text-3xl inline-block">🔄</span>
               <p className="text-gray-600 dark:text-gray-400">
                 {language === 'ar' ? 'جاري تحميل التقويم الإسلامي...' : 'Loading Islamic Calendar...'}
               </p>
@@ -346,7 +331,7 @@ export default function IslamicCalendar() {
     return (
       <div className="min-h-screen">
         <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
           <div className="text-center py-12">
             <div className="bg-red-100 dark:bg-red-900/30 rounded-xl p-6 max-w-md mx-auto">
               <p className="text-red-600 dark:text-red-400 mb-4">{state.error}</p>
@@ -367,7 +352,7 @@ export default function IslamicCalendar() {
     <div className="min-h-screen">
       <Header />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri">
@@ -386,7 +371,7 @@ export default function IslamicCalendar() {
           {/* Current Islamic Year */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 text-center">
             <div className="flex items-center justify-center mb-4">
-              <Moon className="w-8 h-8 text-emerald-600" />
+              <span className="w-8 h-8 text-emerald-600 text-2xl">🌙</span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 font-amiri">
               {language === 'ar' ? 'السنة الهجرية الحالية' : 'Current Hijri Year'}
@@ -399,7 +384,7 @@ export default function IslamicCalendar() {
           {/* Current Islamic Month */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 text-center">
             <div className="flex items-center justify-center mb-4">
-              <Calendar className="w-8 h-8 text-blue-600" />
+              <span className="w-8 h-8 text-blue-600 text-2xl">📅</span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 font-amiri">
               {language === 'ar' ? 'الشهر الهجري الحالي' : 'Current Hijri Month'}
@@ -415,7 +400,7 @@ export default function IslamicCalendar() {
           {/* Ramadan Countdown (replaces Next Holiday) */}
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 text-center">
             <div className="flex items-center justify-center mb-4">
-              <Gift className="w-8 h-8 text-purple-600" />
+              <span className="w-8 h-8 text-purple-600 text-2xl">🎁</span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 font-amiri">
               {language === 'ar' ? 'العد التنازلي لرمضان' : 'Ramadan Countdown'}
@@ -451,7 +436,7 @@ export default function IslamicCalendar() {
                 onClick={toggleCalendarType}
                 className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
               >
-                <ArrowLeftRight className="w-4 h-4" />
+                <span className="w-4 h-4 text-lg">↔️</span>
                 {state.calendarType === 'gregorian' 
                   ? (language === 'ar' ? 'عرض التقويم الهجري' : 'Show Hijri Calendar')
                   : (language === 'ar' ? 'عرض التقويم الميلادي' : 'Show Gregorian Calendar')
@@ -471,7 +456,7 @@ export default function IslamicCalendar() {
                 onClick={() => navigateMonth('prev')}
                 className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <span className="w-5 h-5 text-lg">◀️</span>
               </button>
               
               <div className="text-center min-w-[200px]">
@@ -490,7 +475,7 @@ export default function IslamicCalendar() {
                 onClick={() => navigateMonth('next')}
                 className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
-                <ChevronRight className="w-5 h-5" />
+                <span className="w-5 h-5 text-lg">▶️</span>
               </button>
             </div>
           </div>
@@ -500,7 +485,7 @@ export default function IslamicCalendar() {
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 dark:border-gray-700 mb-8">
           {state.loading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin" />
+              <span className="w-8 h-8 text-emerald-600 animate-spin text-2xl inline-block">🔄</span>
             </div>
           ) : (
             <>
@@ -595,7 +580,7 @@ export default function IslamicCalendar() {
                         {/* Special day badge inside cell */}
                         {isSpecial && (
                           <div className="mt-2 inline-flex items-center gap-1 text-xs text-purple-700 dark:text-purple-300">
-                            <Star className="w-3 h-3" />
+                            <span className="w-3 h-3 text-sm">⭐</span>
                             <span>
                               {language === 'ar'
                                 ? (specialInfo?.name?.ar || specialInfo?.name?.en || (day?.date?.hijri?.holidays || []).find((h) => !!h && h.trim().length > 0) || 'مناسبة خاصة')
@@ -641,7 +626,7 @@ export default function IslamicCalendar() {
                 <div>
                   {state.selectedSpecial ? (
                     <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
-                      <Star className="w-4 h-4" />
+                      <span className="w-4 h-4 text-lg">⭐</span>
                       <span className="font-medium">
                         {language === 'ar' ? (state.selectedSpecial.name.ar || state.selectedSpecial.name.en) : (state.selectedSpecial.name.en || state.selectedSpecial.name.ar)}
                       </span>

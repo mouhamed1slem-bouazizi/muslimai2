@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Volume2, VolumeX, Clock, Calculator, Save, Loader2 } from 'lucide-react';
 import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCalculationMethodName } from '@/lib/prayer-times';
@@ -92,7 +91,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
         : 'bg-white/80 backdrop-blur-lg border border-white/20'
     } rounded-2xl shadow-2xl p-6`}>
       <div className="flex items-center gap-3 mb-6">
-        <Bell className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+        <span className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>🔔</span>
         <h2 className={`text-xl font-semibold ${
           theme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
@@ -113,7 +112,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
             {/* Enable Notifications */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Bell className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                <span className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>🔔</span>
                 <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>
                   {language === 'ar' ? 'تفعيل الإشعارات' : 'Enable Notifications'}
                 </span>
@@ -136,9 +135,9 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {soundEnabled ? (
-                  <Volume2 className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <span className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>🔊</span>
                 ) : (
-                  <VolumeX className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <span className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>🔇</span>
                 )}
                 <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>
                   {language === 'ar' ? 'الصوت' : 'Sound'}
@@ -281,7 +280,7 @@ export default function UserPreferences({ onPreferencesUpdate }: UserPreferences
             {/* Show Seconds */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Clock className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                <span className={`w-5 h-5 text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>⏰</span>
                 <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>
                   {language === 'ar' ? 'إظهار الثواني' : 'Show Seconds'}
                 </span>
