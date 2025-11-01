@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '@/app/providers';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCurrentPosition, reverseGeocode, getCompleteLocation } from '@/lib/location';
+import { MagnifyingGlassIcon as Search, ReloadIcon as Loader2 } from '@radix-ui/react-icons';
 import toast from 'react-hot-toast';
 import { logger } from '@/lib/logger';
 
