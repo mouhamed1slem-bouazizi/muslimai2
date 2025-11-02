@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/app/providers';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,11 @@ export default function ProfilePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+  // Mobile compact header state (iOS large-title style)
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
 
   // Offline hadith manager state
   const initialLang: HadithLang = language === 'ar' ? 'ar' : 'en';
@@ -67,6 +72,48 @@ export default function ProfilePage() {
   useEffect(() => {
     // load offline hadith list
     idbListBooks().then(setOfflineBooks).catch(() => {});
+  }, []);
+
+  // Observe the large title to toggle compact header on mobile
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Fallback: scroll-based toggle for compact header on mobile, plus progress for animation
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64;
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight;
+      const end = start + 60;
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   const onSubmit = async (data: ProfileFormData) => {
@@ -192,12 +239,18 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header compactTitle={language === 'ar' ? 'الملف الشخصي' : 'Profile Settings'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri">
+          <h1
+            ref={titleRef}
+            className={`text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri transition-transform duration-200 origin-top`}
+            style={{
+              transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+            }}
+          >
             {language === 'ar' ? 'الملف الشخصي' : 'Profile Settings'}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
