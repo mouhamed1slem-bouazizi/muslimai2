@@ -63,6 +63,11 @@ export default function QiblaPage() {
   const [facingQibla, setFacingQibla] = useState<boolean>(false);
   const [lastVibrateAt, setLastVibrateAt] = useState<number>(0);
 
+  // iOS-style large title collapse
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
   useEffect(() => {
@@ -72,6 +77,48 @@ export default function QiblaPage() {
       : { lat: KAABA.lat, lng: KAABA.lng };
     setCenter(initialCenter);
   }, [appLocation]);
+
+  // Observe large title to toggle compact header on mobile (mirror Prayer Times)
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Scroll-based fallback to compute collapse progress (mirror Prayer Times)
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 on mobile
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight; // when large title hits the header
+      const end = start + 60; // animate collapse over ~60px range
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   useEffect(() => {
     // Load Google Maps and init map
@@ -269,11 +316,25 @@ export default function QiblaPage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header
+        compactTitle={titleText}
+        showCompactTitle={showCompactHeader}
+        transparent
+        collapseProgress={collapseProgress}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
-        <div className="mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-amiri">{titleText}</h1>
+        <div className="text-center mb-6">
+          <h1
+            ref={titleRef}
+            className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-amiri transition-transform duration-200 origin-top"
+            style={{
+              transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+              willChange: 'transform',
+            }}
+          >
+            {titleText}
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{subtitleText}</p>
         </div>
 

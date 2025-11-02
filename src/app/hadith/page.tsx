@@ -241,7 +241,7 @@ export default function HadithPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header compactTitle={`${title}${bookName ? ` — ${bookName}` : ''}`} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
+      <Header compactTitle={title} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       {showOnboarding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className={`max-w-lg w-[92%] rounded-2xl p-6 border ${calmCard} backdrop-blur`}>
@@ -314,7 +314,7 @@ export default function HadithPage() {
               transform: `translateY(${(-16 * collapseProgress).toFixed(2)}px) scale(${(1 - 0.12 * collapseProgress).toFixed(3)})`,
             }}
           >
-            {title}{bookName ? ` — ${bookName}` : ''}
+            {title}
           </h1>
         </div>
 
