@@ -22,7 +22,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { logger } from '@/lib/logger';
 
-const Header = () => {
+interface HeaderProps {
+  compactTitle?: string;
+  showCompactTitle?: boolean;
+  transparent?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false, transparent = false }) => {
   const { language, setLanguage, theme, setTheme } = useApp();
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -103,7 +109,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+    <header className={`fixed top-0 left-0 right-0 z-50 ${transparent ? 'bg-transparent' : 'bg-white/80 dark:bg-gray-900/80'} backdrop-blur-sm border-b border-gray-200 dark:border-gray-800`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
@@ -123,6 +129,13 @@ const Header = () => {
               </p>
             </div>
           </Link>
+
+          {/* Mobile compact center title (iOS large-title collapse) */}
+          <div className="flex-1 lg:hidden flex items-center justify-center">
+            <span className={`text-base font-semibold text-gray-900 dark:text-white transition-opacity duration-200 ${showCompactTitle ? 'opacity-100' : 'opacity-0'}`}>
+              {compactTitle}
+            </span>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">

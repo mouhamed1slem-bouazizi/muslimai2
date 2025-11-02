@@ -341,7 +341,7 @@ export default function PrayerTimesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Header />
+        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
 
       <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -360,7 +360,7 @@ export default function PrayerTimesPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Header />
+        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
         <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -383,7 +383,7 @@ export default function PrayerTimesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header />
+      <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
       
       {showFajrInfo && (
         <div
