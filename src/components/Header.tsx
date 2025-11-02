@@ -13,6 +13,14 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -282,14 +290,7 @@ const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false,
                   </NavigationMenuLink>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/donate" className="group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 hover:text-gray-900 dark:hover:text-white transition-all duration-200">
-                        <span className="w-4 h-4 mr-2">❤️</span>
-                        {language === 'ar' ? 'المفضلة' : 'Favorites'}
-                      </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                {/* Donate moved into user dropdown to save header space */}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -323,26 +324,44 @@ const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false,
               </span>
             </Button>
 
-            {/* User Menu */}
+            {/* User Menu - desktop dropdown to save space */}
             {user ? (
-              <div className="hidden lg:flex items-center space-x-3">
-                <Link href="/profile" className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 hover:scale-105 cursor-pointer">
-                  <span className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-lg">👤</span>
-                  </span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {user.email?.split('@')[0]}
-                  </span>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="h-10 px-3 rounded-xl bg-red-100/80 dark:bg-red-900/20 hover:bg-red-200/80 dark:hover:bg-red-900/40 border-0 transition-all duration-200 hover:scale-105 text-red-600 dark:text-red-400"
-                >
-                  <span className="h-4 w-4 mr-2">🚪</span>
-                  {language === 'ar' ? 'خروج' : 'Logout'}
-                </Button>
+              <div className="hidden lg:flex items-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-10 w-10 rounded-full bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105"
+                      aria-label={language === 'ar' ? 'قائمة المستخدم' : 'User menu'}
+                    >
+                      <span className="text-lg">👤</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="min-w-[12rem]">
+                    <DropdownMenuLabel>
+                      {user.email?.split('@')[0] || (language === 'ar' ? 'المستخدم' : 'User')}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">
+                        <span className="mr-2">👤</span>
+                        {language === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/donate">
+                        <span className="mr-2">❤️</span>
+                        {language === 'ar' ? 'تبرع' : 'Donate'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} variant="destructive">
+                      <span className="mr-2">🚪</span>
+                      {language === 'ar' ? 'خروج' : 'Logout'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               <div className="hidden lg:flex items-center space-x-2">
@@ -366,6 +385,27 @@ const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false,
                     {language === 'ar' ? 'إنشاء حساب' : 'Sign Up'}
                   </Link>
                 </Button>
+                {/* Compact dropdown for additional actions (Donate) */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-10 w-10 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 border-0 transition-all duration-200 hover:scale-105"
+                      aria-label={language === 'ar' ? 'المزيد' : 'More'}
+                    >
+                      <span className="text-base">⋯</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link href="/donate">
+                        <span className="mr-2">❤️</span>
+                        {language === 'ar' ? 'تبرع' : 'Donate'}
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             )}
 
