@@ -210,6 +210,26 @@ export default function PrayerTimesPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Fallback: scroll-based toggle for compact header on mobile
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 on mobile
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const scrolled = window.scrollY >= titleTop - headerHeight;
+      setShowCompactHeader(scrolled);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
   // Fetch current dates
   const fetchCurrentDates = async () => {
     try {
@@ -667,17 +687,6 @@ export default function PrayerTimesPage() {
         </div>
       )}
  
-        {/* Mobile sticky compact header (iOS large title effect) */}
-        <div className={`sticky top-0 z-30 md:hidden ${showCompactHeader ? '' : ''}`}>
-          <div className={`transition-all duration-200 ${showCompactHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'} pointer-events-none`}>
-            <div className="h-12 flex items-center px-4 backdrop-blur bg-white/70 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
-              <span className="text-base font-semibold text-gray-900 dark:text-white">
-                {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
-              </span>
-            </div>
-          </div>
-        </div>
-
         <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
         {/* Page Title */}
         <div className="text-center mb-8">
