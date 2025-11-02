@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../providers';
 import Header from '@/components/Header';
 import IslamicStoryCard from '@/components/IslamicStoryCard';
@@ -45,6 +45,10 @@ interface CalendarState {
 export default function IslamicCalendar() {
   const { language, theme } = useApp();
   const [currentTime, setCurrentTime] = useState(new Date());
+  // Mobile compact header state (iOS large-title style)
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [state, setState] = useState<CalendarState>({
     currentIslamicYear: 0,
     currentIslamicMonth: 0,
@@ -68,6 +72,50 @@ export default function IslamicCalendar() {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Observe the large title to toggle compact header on mobile
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When large title scrolls out of view, show compact header
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        // Start showing compact header a bit before the title completely leaves
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Fallback: scroll-based toggle for compact header on mobile, plus progress for animation
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 on mobile
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight; // when the large title hits the header
+      const end = start + 60; // range over which we animate collapse
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   // Load initial data
@@ -312,7 +360,7 @@ export default function IslamicCalendar() {
   if (state.loading && state.islamicMonths.length === 0) {
     return (
       <div className="min-h-screen">
-        <Header />
+        <Header compactTitle={language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -330,7 +378,7 @@ export default function IslamicCalendar() {
   if (state.error) {
     return (
       <div className="min-h-screen">
-        <Header />
+        <Header compactTitle={language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
           <div className="text-center py-12">
             <div className="bg-red-100 dark:bg-red-900/30 rounded-xl p-6 max-w-md mx-auto">
@@ -350,12 +398,18 @@ export default function IslamicCalendar() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header compactTitle={language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri">
+          <h1
+            ref={titleRef}
+            className={`text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 font-amiri transition-transform duration-200 origin-top`}
+            style={{
+              transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+            }}
+          >
             {language === 'ar' ? 'التقويم الإسلامي' : 'Islamic Calendar'}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
