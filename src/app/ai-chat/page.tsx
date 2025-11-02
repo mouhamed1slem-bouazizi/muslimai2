@@ -41,6 +41,12 @@ export default function AIChatPage() {
   const [dateFilter, setDateFilter] = useState<{ from?: Date; to?: Date }>({});
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isRTL = language === 'ar';
+
+  // Mobile compact header state (iOS large-title style)
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -67,6 +73,48 @@ export default function AIChatPage() {
       loadChatHistory();
     }
   }, [user, showHistory]);
+
+  // Observe the large title to toggle compact header on mobile
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Scroll-based fallback to compute collapse progress
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 on mobile
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight; // when large title hits the header
+      const end = start + 60; // animate collapse over ~60px range
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   const startNewSession = async () => {
     if (!user) return;
@@ -213,13 +261,22 @@ export default function AIChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header />
+      <Header
+        compactTitle={language === 'ar' ? 'المساعد الذكي الإسلامي' : 'Islamic AI Assistant'}
+        showCompactTitle={showCompactHeader}
+        transparent
+        collapseProgress={collapseProgress}
+      />
       
       <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24 max-w-6xl">
         {/* Page Title and History Toggle */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white font-amiri">
+            <h1
+              ref={titleRef}
+              className={`text-5xl md:text-4xl font-bold text-gray-900 dark:text-white ${isRTL ? 'font-amiri' : ''} transition-transform duration-200 origin-top`}
+              style={{ transform: `translateY(${(-16 * collapseProgress).toFixed(2)}px) scale(${(1 - 0.12 * collapseProgress).toFixed(3)})` }}
+            >
               {language === 'ar' ? 'المساعد الذكي الإسلامي' : 'Islamic AI Assistant'}
             </h1>
             {user && (
