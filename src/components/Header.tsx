@@ -26,9 +26,9 @@ interface HeaderProps {
   compactTitle?: string;
   showCompactTitle?: boolean;
   transparent?: boolean;
+  collapseProgress?: number; // 0 → large title visible, 1 → compact title fully shown
 }
-
-const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false, transparent = false }) => {
+const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false, transparent = false, collapseProgress = 0 }) => {
   const { language, setLanguage, theme, setTheme } = useApp();
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -108,8 +108,17 @@ const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false,
     }, 200);
   };
 
+  const progress = Math.min(Math.max(collapseProgress ?? (showCompactTitle ? 1 : 0), 0), 1);
+
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 ${transparent ? 'bg-transparent' : 'bg-white/80 dark:bg-gray-900/80'} backdrop-blur-sm border-b border-gray-200 dark:border-gray-800`}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 ${transparent ? 'bg-transparent' : 'bg-white/80 dark:bg-gray-900/80'} backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 transition-colors duration-200`}
+      style={transparent ? {
+        backgroundColor: theme === 'dark'
+          ? `rgba(17, 24, 39, ${progress * 0.5})` // dark:bg-gray-900 with progressive alpha
+          : `rgba(255, 255, 255, ${progress * 0.82})`, // light:bg-white with progressive alpha
+      } : undefined}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
@@ -132,7 +141,13 @@ const Header: React.FC<HeaderProps> = ({ compactTitle, showCompactTitle = false,
 
           {/* Mobile compact center title (iOS large-title collapse) */}
           <div className="flex-1 lg:hidden flex items-center justify-center">
-            <span className={`text-base font-semibold text-gray-900 dark:text-white transition-opacity duration-200 ${showCompactTitle ? 'opacity-100' : 'opacity-0'}`}>
+            <span
+              className="text-base font-semibold text-gray-900 dark:text-white transition-all duration-200 will-change-transform will-change-opacity"
+              style={{
+                opacity: progress,
+                transform: `translateY(${(1 - progress) * 6}px)`,
+              }}
+            >
               {compactTitle}
             </span>
           </div>

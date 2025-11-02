@@ -85,6 +85,7 @@ export default function PrayerTimesPage() {
 
   // Mobile compact header state (iOS large-title style)
   const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
 
   // Update current time every second
@@ -217,8 +218,12 @@ export default function PrayerTimesPage() {
       if (!el) return;
       const headerHeight = 64; // h-16 on mobile
       const titleTop = el.getBoundingClientRect().top + window.scrollY;
-      const scrolled = window.scrollY >= titleTop - headerHeight;
-      setShowCompactHeader(scrolled);
+      const start = titleTop - headerHeight; // when the large title hits the header
+      const end = start + 60; // range over which we animate collapse
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -361,7 +366,7 @@ export default function PrayerTimesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
+        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
 
       <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -380,7 +385,7 @@ export default function PrayerTimesPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
+        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
         <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -403,7 +408,7 @@ export default function PrayerTimesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent />
+        <Header compactTitle={language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       
       {showFajrInfo && (
         <div
@@ -690,7 +695,13 @@ export default function PrayerTimesPage() {
         <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
         {/* Page Title */}
         <div className="text-center mb-8">
-          <h1 ref={titleRef} className={`text-5xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri transition-transform duration-300 ${showCompactHeader ? 'md:scale-100 md:translate-y-0' : 'md:scale-100 md:translate-y-0'}`}>
+          <h1
+            ref={titleRef}
+            className={`text-5xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri transition-transform duration-200 origin-top`}
+            style={{
+              transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+            }}
+          >
             {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
