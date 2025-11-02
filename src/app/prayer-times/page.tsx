@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../providers';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -82,6 +82,10 @@ export default function PrayerTimesPage() {
   const [showIshaInfo, setShowIshaInfo] = useState(false);
   const [ishaContent, setIshaContent] = useState<IshaOverlayContent | null>(null);
   const [ishaContentLoading, setIshaContentLoading] = useState<boolean>(true);
+
+  // Mobile compact header state (iOS large-title style)
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
 
   // Update current time every second
   useEffect(() => {
@@ -184,6 +188,26 @@ export default function PrayerTimesPage() {
       }
     })();
     return () => { active = false; };
+  }, []);
+
+  // Observe the large title to toggle compact header on mobile
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When large title scrolls out of view, show compact header
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        // Start showing compact header a bit before the title completely leaves
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Fetch current dates
@@ -643,10 +667,21 @@ export default function PrayerTimesPage() {
         </div>
       )}
  
+        {/* Mobile sticky compact header (iOS large title effect) */}
+        <div className={`sticky top-0 z-30 md:hidden ${showCompactHeader ? '' : ''}`}>
+          <div className={`transition-all duration-200 ${showCompactHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'} pointer-events-none`}>
+            <div className="h-12 flex items-center px-4 backdrop-blur bg-white/70 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
+              <span className="text-base font-semibold text-gray-900 dark:text-white">
+                {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="container mx-auto px-4 py-8 pt-20 lg:pt-24">
         {/* Page Title */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri">
+          <h1 ref={titleRef} className={`text-5xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri transition-transform duration-300 ${showCompactHeader ? 'md:scale-100 md:translate-y-0' : 'md:scale-100 md:translate-y-0'}`}>
             {language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
