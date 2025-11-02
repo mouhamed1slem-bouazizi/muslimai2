@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import { useApp } from '../providers';
 import { fetchQuran, getMetadata, type LanguageCode, type Ayah } from '@/lib/quran-api';
@@ -24,6 +24,53 @@ export default function TafsirPage() {
   const [surahAyahs, setSurahAyahs] = useState<Ayah[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // iOS-style large title collapse (mirror Prayer Times)
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+
+  // Observe the large title to toggle compact header on mobile
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Fallback: scroll-based toggle for compact header on mobile
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 on mobile
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight;
+      const end = start + 60;
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   // Load initial surah from localStorage
   useEffect(() => {
@@ -92,11 +139,19 @@ export default function TafsirPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header />
+      <Header compactTitle={title} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         {/* Title */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri">{title}</h1>
+        <div className="text-center mb-8">
+          <h1
+            ref={titleRef}
+            className={`text-5xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-amiri transition-transform duration-200 origin-top`}
+            style={{
+              transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+            }}
+          >
+            {title}
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">{subtitle}</p>
         </div>
 
