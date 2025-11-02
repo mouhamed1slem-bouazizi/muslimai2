@@ -435,7 +435,7 @@ export default function PrayerTimesPage() {
           <div className="absolute inset-0 flex items-center justify-center p-6 z-20 pointer-events-auto">
             <div className="max-w-2xl text-white text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4 font-amiri">
-                {language === 'ar' ? 'سنة الفجر' : 'Sunnah of Fajr'}
+                {language === 'ar' ? 'الفجر' : 'Fajr'}
               </h2>
               {fajrContentLoading ? (
                 <div className="flex items-center justify-center">
