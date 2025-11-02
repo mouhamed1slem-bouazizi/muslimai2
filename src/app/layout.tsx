@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Amiri } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const amiri = Amiri({ 
@@ -34,9 +33,6 @@ export default function RootLayout({
       <body className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-gray-900 dark:to-gray-800 font-inter">
         <Providers>
           <div className="flex flex-col min-h-screen">
-            <div className="fixed top-3 right-3 z-50">
-              <ThemeToggle />
-            </div>
             {children}
           </div>
         </Providers>
