@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import { useApp } from '../providers';
 
@@ -17,6 +17,11 @@ export default function AsmaAlHusnaPage() {
   const title = language === 'ar' ? 'أسماء الله الحسنى' : 'Asma al Husna';
   const subtitle = language === 'ar' ? 'تعرف على الأسماء الحسنى ومعانيها' : 'Explore the Beautiful Names of Allah';
   const calmCard = theme === 'dark' ? 'bg-gray-800/80 border-gray-700' : 'bg-white/90 border-white/30';
+
+  // iOS-style large title collapse
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
 
   const [featured, setFeatured] = useState<AsmaItem | null>(null);
   const [aiEn, setAiEn] = useState('');
@@ -99,6 +104,48 @@ export default function AsmaAlHusnaPage() {
     fetchAI();
   }, [featured, language]);
 
+  // Mirror Prayer Times: IntersectionObserver toggles compact header
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+        rootMargin: '-56px 0px 0px 0px',
+      }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Mirror Prayer Times: scroll fallback to compute collapse progress
+  useEffect(() => {
+    const onScroll = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const headerHeight = 64; // h-16 mobile header
+      const titleTop = el.getBoundingClientRect().top + window.scrollY;
+      const start = titleTop - headerHeight;
+      const end = start + 60; // animation range
+      const raw = (window.scrollY - start) / (end - start);
+      const progress = Math.max(0, Math.min(1, raw));
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const onResize = () => onScroll();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
   const meaningFrom = (item: AsmaItem | null) => {
     if (!item) return '';
     return language === 'ar'
@@ -108,9 +155,23 @@ export default function AsmaAlHusnaPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header />
+      <Header
+        compactTitle={title}
+        showCompactTitle={showCompactHeader}
+        transparent
+        collapseProgress={collapseProgress}
+      />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 font-amiri text-center">{title}</h1>
+        <h1
+          ref={titleRef}
+          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 font-amiri text-center transition-transform duration-200 origin-top"
+          style={{
+            transform: `translateY(${-16 * collapseProgress}px) scale(${1 - 0.12 * collapseProgress})`,
+            willChange: 'transform',
+          }}
+        >
+          {title}
+        </h1>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-6">{subtitle}</p>
 
         {/* Featured Name Card */}
