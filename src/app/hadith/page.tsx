@@ -30,6 +30,10 @@ export default function HadithPage() {
   const [perPage, setPerPage] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
+  // Mobile compact header state (iOS large-title style)
+  const [showCompactHeader, setShowCompactHeader] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
 
   // Onboarding overlay and offline download state
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
@@ -124,6 +128,49 @@ export default function HadithPage() {
   const isArabic = lang === 'ar';
   const title = isArabic ? 'الحديث' : 'Hadith';
 
+  // Large title collapse behavior (mirror Prayer Times)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const el = titleRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setShowCompactHeader(!entry.isIntersecting);
+      },
+      { rootMargin: '-56px 0px 0px 0px', threshold: 0 }
+    );
+    observer.observe(el);
+
+    const headerHeight = 64; // matches Header height
+    const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+    let raf = 0;
+
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const titleTop = rect.top + window.scrollY;
+      const start = titleTop - headerHeight;
+      const end = start + 60;
+      const progress = clamp((window.scrollY - start) / (end - start), 0, 1);
+      setCollapseProgress(progress);
+      setShowCompactHeader(progress > 0.02);
+    };
+
+    const onScroll = () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
+    const onResize = () => { if (raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    raf = requestAnimationFrame(update);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   async function startOfflineDownload() {
     if (downloading) return;
     setDownloadError('');
@@ -194,7 +241,7 @@ export default function HadithPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Header />
+      <Header compactTitle={`${title}${bookName ? ` — ${bookName}` : ''}`} showCompactTitle={showCompactHeader} transparent collapseProgress={collapseProgress} />
       {showOnboarding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className={`max-w-lg w-[92%] rounded-2xl p-6 border ${calmCard} backdrop-blur`}>
@@ -260,7 +307,15 @@ export default function HadithPage() {
       )}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 lg:pt-24">
         <div className="text-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-amiri">{title}{bookName ? ` — ${bookName}` : ''}</h1>
+          <h1
+            ref={titleRef}
+            className="text-5xl md:text-4xl font-bold text-gray-900 dark:text-white font-amiri transition-transform duration-200 origin-top"
+            style={{
+              transform: `translateY(${(-16 * collapseProgress).toFixed(2)}px) scale(${(1 - 0.12 * collapseProgress).toFixed(3)})`,
+            }}
+          >
+            {title}{bookName ? ` — ${bookName}` : ''}
+          </h1>
         </div>
 
         <div className={`rounded-2xl shadow-2xl p-4 md:p-6 border ${calmCard}`}>
